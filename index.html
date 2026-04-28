@@ -354,48 +354,61 @@ const SVG = {
 
 
 // ── GOOGLE SHEETS DATA SOURCE ──────────────────────────────────────────────
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1JsaWzecsjnTjlJgK4QgRaG9kTGw-m_6k4wNW36PVQLI/export?format=csv&gid=43282257';
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKueAYOMUQ5THbJF-k6cE52r2b3RGBgc1OTOv9_kSqkfTmaEfo3yCxB35ZoLsf-6INvXuQiHMBvKgK/pub?output=csv';
 
 // Parse CSV → array of row objects
 function parseCSV(text) {
-  const lines = text.trim().split('\n');
-  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
+  // 1. Fix the hidden \r\n carriage return issue
+  const lines = text.trim().split(/\r?\n/);
+  
+  // 2. Make headers lowercase so "ID", "Lat", "Lng" matches "id", "lat", "lng"
+  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim().toLowerCase());
+  
   return lines.slice(1).filter(l => l.trim()).map(line => {
     const cols = [];
     let cur = '', inQ = false;
     for (const ch of line) {
       if (ch === '"') { inQ = !inQ; }
-      else if (ch === ',' && !inQ) { cols.push(cur); cur = ''; }
+      else if (ch === ',' && !inQ) { 
+        cols.push(cur.replace(/^"|"$/g, '').trim()); 
+        cur = ''; 
+      }
       else cur += ch;
     }
-    cols.push(cur);
+    cols.push(cur.replace(/^"|"$/g, '').trim());
+    
     const row = {};
-    headers.forEach((h, i) => row[h] = (cols[i] || '').trim());
+    headers.forEach((h, i) => row[h] = (cols[i] || ''));
     return row;
   });
 }
 
 // Convert CSV row → facility object
 function rowToFacility(row) {
-  const type = (row.type || '').trim().toLowerCase();
+  const type = (row.type || '').toLowerCase();
+  
+  // 3. Handle Indonesian coordinate formats (replace comma with dot if user typed -1,234)
+  const safeLat = parseFloat((row.lat || '').replace(',', '.'));
+  const safeLng = parseFloat((row.lng || '').replace(',', '.'));
+
   return {
     id:         parseInt(row.id),
-    name:       (row.name || '').trim(),
+    name:       row.name || '',
     type:       type,
-    city:       (row.city || '').trim(),
-    phone:      (row.phone || '—').trim(),
-    lat:        parseFloat(row.lat),
-    lng:        parseFloat(row.lng),
-    visitHours: (row.visitHours || '').replace(/\|/g, '\n').trim(),
-    gmapsQuery: (row.gmapsQuery || '').trim(),
-    photo:      (row.photo || '').trim() || null,
+    city:       row.city || '',
+    phone:      row.phone || '—',
+    lat:        safeLat,
+    lng:        safeLng,
+    visitHours: (row.visithours || row['visit hours'] || '').replace(/\|/g, '\n'), // handles "visitHours" or "visit hours"
+    gmapsQuery: row.gmapsquery || row['gmaps query'] || '',
+    photo:      row.photo || null,
     social: {
-      instagram: (row.instagram || '').trim() || null,
-      facebook:  (row.facebook  || '').trim() || null,
-      twitter:   (row.twitter   || '').trim() || null,
-      youtube:   (row.youtube   || '').trim() || null,
-      tiktok:    (row.tiktok    || '').trim() || null,
-      whatsapp:  (row.whatsapp  || '').trim() || null,
+      instagram: row.instagram || null,
+      facebook:  row.facebook  || null,
+      twitter:   row.twitter   || null,
+      youtube:   row.youtube   || null,
+      tiktok:    row.tiktok    || null,
+      whatsapp:  row.whatsapp  || null,
     }
   };
 }
