@@ -404,6 +404,12 @@ function rowToFacility(row) {
 let facilities = [];
 
 function initMap() {
+const typeEmoji = { lapas:'🏛', rutan:'🔒', lpp:'🏠', lpka:'👦', lpn:'💊', bapas:'📋', kanwil:'🏢' };
+const typeLabel = {
+  lapas:'Lembaga Pemasyarakatan', rutan:'Rumah Tahanan Negara',
+  lpp:'Lapas Perempuan', lpka:'Lapas Pembinaan Khusus Anak',
+  lpn:'Lapas Narkotika', bapas:'Balai Pemasyarakatan', kanwil:'Kantor Wilayah',
+};
 // ── TYPE CONFIG ────────────────────────────────────────────────────────────
 const typeConfig = {
   lapas: { color:'#4a9ede', label:'LAPAS',  letter:'L' },
@@ -413,12 +419,6 @@ const typeConfig = {
   lpn:   { color:'#2ec48a', label:'LPN',    letter:'N' },
   bapas: { color:'#fb923c', label:'BAPAS',  letter:'B' },
   kanwil:{ color:'#f87171', label:'KANWIL', letter:'K' },
-};
-const typeEmoji = { lapas:'🏛', rutan:'🔒', lpp:'🏠', lpka:'👦', lpn:'💊', bapas:'📋', kanwil:'🏢' };
-const typeLabel = {
-  lapas:'Lembaga Pemasyarakatan', rutan:'Rumah Tahanan Negara',
-  lpp:'Lapas Perempuan', lpka:'Lapas Pembinaan Khusus Anak',
-  lpn:'Lapas Narkotika', bapas:'Balai Pemasyarakatan', kanwil:'Kantor Wilayah',
 };
 
 // ── MAKE PIN ICON ────────────────────────────────────────────
