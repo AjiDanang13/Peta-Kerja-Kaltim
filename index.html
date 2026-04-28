@@ -381,7 +381,7 @@ function rowToFacility(row) {
   return {
     id:         parseInt(row.id),
     name:       row.name,
-    type:       row.type,
+    type:       (row.type || '').trim().toLowerCase(),
     city:       row.city,
     phone:      row.phone || '—',
     lat:        parseFloat(row.lat),
@@ -421,7 +421,7 @@ const typeLabel = {
 
 // ── MAKE PIN ICON ────────────────────────────────────────────
 function makeIcon(f, active = false) {
-  const c   = typeConfig[f.type];
+  const c = typeConfig[f.type] || typeConfig['lapas']; // fallback if type unknown
   const W   = active ? 48 : 36;
   const TH  = active ? 12 : 9;
   const bw  = active ? 2.5 : 2;
