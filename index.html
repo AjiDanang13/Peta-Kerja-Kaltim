@@ -773,14 +773,16 @@ const PROXIES = [
   u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
 ];
 
+// ── FETCH LANGSUNG KE GOOGLE SHEETS ────────────────────────────────────────
 async function fetchCSV(url) {
-  for (const proxy of PROXIES) {
-    try {
-      const res = await fetch(proxy(url), { cache:'no-store' });
-      if (res.ok) return await res.text();
-    } catch(_) {}
+  try {
+    // Tarik data langsung tanpa proxy
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+    return await res.text();
+  } catch (err) {
+    throw new Error('Gagal terhubung ke Google Sheets. Pastikan link sudah benar dan dipublish ke web.');
   }
-  throw new Error('Gagal terhubung ke Google Sheets');
 }
 
 function showError(msg) {
