@@ -352,26 +352,55 @@ const SVG = {
   gmaps:`<svg viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`,
 };
 
-// ── FACILITIES DATA ────────────────────────────────────────────────────────
-const facilities = [
-  { id:1,  name:"Kantor Wilayah Ditjenpas Kalimantan Timur",           type:"kanwil", city:"Samarinda",                   phone:"—",              lat:-0.491740, lng:117.119616, gmapsQuery:"Kantor Wilayah Ditjenpas Kalimantan Timur Samarinda",              visitHours:"Senin–Kamis: 07.30–12.00 & 13.00–16.00\nJumat: 07.30–11.30 & 13.00–16.30", photo:null, social:{ instagram:"https://www.instagram.com/pemasyarakatan_kaltim/", facebook:"https://www.facebook.com/DitjenpasKaltim", twitter:"https://x.com/ditjenpaskaltim", youtube:"https://www.youtube.com/@DitjenpasKaltim", tiktok:"https://www.tiktok.com/@pemasyarakatan_kaltim", whatsapp:null } },
-  { id:2,  name:"Rumah Tahanan Kelas IIB Tanah Grogot",                type:"rutan",  city:"Tanah Grogot, Paser",          phone:"(0543) 21748",   lat:-1.879113, lng:116.176354, gmapsQuery:"Rumah Tahanan Kelas IIB Tanah Grogot Paser",                      visitHours:"Senin–Kamis: 09.00–12.00\nJumat–Sabtu: 09.00–11.30",               photo:null, social:{ instagram:"https://www.instagram.com/rutantanahgrogot/", facebook:"https://www.facebook.com/rutan.tanahgrogot.31", twitter:"https://x.com/RutanTGrogot", youtube:"https://www.youtube.com/@rutantanahgrogot", tiktok:"https://www.tiktok.com/@rutantanahgrogot", whatsapp:"https://api.whatsapp.com/send/?phone=6285191668948&text&type=phone_number&app_absent=0" } },
-  { id:3,  name:"Balai Pemasyarakatan Kelas I Balikpapan",             type:"bapas",  city:"Balikpapan",                   phone:"(0542) 763021",  lat:-1.274110, lng:116.866755, gmapsQuery:"Balai Pemasyarakatan Kelas I Balikpapan",                         visitHours:"Senin–Kamis: 07.30–16.00\nJumat: 07.30–16.30",                     photo:null, social:{ instagram:"https://www.instagram.com/bapas_balikpapan/", facebook:"https://www.facebook.com/BapasKelasIIBalikpapan/", twitter:"https://x.com/BapasBalikpapan", youtube:"https://www.youtube.com/@bapasbalikpapan390", tiktok:"https://www.tiktok.com/@bapas.balikpapan", whatsapp:"https://api.whatsapp.com/send/?phone=6289508966459&text&type=phone_number&app_absent=0" } },
-  { id:4,  name:"Lembaga Pembinaan Khusus Anak Kelas II Tenggarong",   type:"lpka",   city:"Tenggarong, Kutai Kartanegara", phone:"—",              lat:-0.420430, lng:116.988995, gmapsQuery:"Lembaga Pembinaan Khusus Anak Kelas II Tenggarong",               visitHours:"Senin–Kamis: 08.00–15.00\nJumat: 08.00–14.30\nSabtu: 08.00–11.00", photo:null, social:{ instagram:"https://www.instagram.com/lpka.tenggarong/", facebook:"https://www.facebook.com/lpka.tenggarong", twitter:"https://x.com/lpka_tenggarong", youtube:"https://www.youtube.com/@lpkasamarinda1145", tiktok:"https://www.tiktok.com/@diarylpkatgr", whatsapp:null } },
-  { id:5,  name:"Lembaga Pemasyarakatan Kelas IIA Balikpapan",         type:"lapas",  city:"Balikpapan",                   phone:"(0542) 761660",  lat:-1.274996, lng:116.864338, gmapsQuery:"Lembaga Pemasyarakatan Kelas IIA Balikpapan",                     visitHours:"Selasa–Kamis: 09.00–11.30\nSabtu: 09.00–11.30",                    photo:null, social:{ instagram:"https://www.instagram.com/lapas_balikpapan/", facebook:"https://www.facebook.com/LapasStalkuda", twitter:"https://x.com/lapasbalikpapan", youtube:"https://www.youtube.com/@lapasbalikpapan9496", tiktok:"https://www.tiktok.com/@lapas.balikpapan", whatsapp:"https://api.whatsapp.com/send/?phone=6281254897855&text&type=phone_number&app_absent=0" } },
-  { id:6,  name:"Rumah Tahanan Kelas IIB Tanjung Redeb",               type:"rutan",  city:"Tanjung Redeb, Berau",         phone:"0822-7777-8027", lat:2.138348,  lng:117.498450, gmapsQuery:"Rumah Tahanan Kelas IIB Tanjung Redeb Berau",                     visitHours:"Senin–Selasa: 09.00–12.00 & 13.00–14.00\nKamis & Sabtu: 09.00–12.00 & 13.00–14.00", photo:null, social:{ instagram:"https://www.instagram.com/rutantanjungredeb/", facebook:"https://www.facebook.com/RutanBerau", twitter:"https://x.com/RutanTjgRedeb", youtube:"https://www.youtube.com/@rutantanjungredeb6275", tiktok:"https://www.tiktok.com/@rutan.tg.redeb", whatsapp:"https://api.whatsapp.com/send/?phone=6282277778027&text&type=phone_number&app_absent=0" } },
-  { id:7,  name:"Lembaga Pemasyarakatan Kelas IIA Samarinda",          type:"lapas",  city:"Samarinda",                   phone:"0823-3333-2984", lat:-0.500675, lng:117.142157, gmapsQuery:"Lembaga Pemasyarakatan Kelas IIA Samarinda",                      visitHours:"Senin–Kamis: 09.00–11.00 & 13.00–14.20\nSabtu: 09.00–11.00 & 12.30–13.15", photo:null, social:{ instagram:"https://www.instagram.com/lapassamarinda/", facebook:"https://www.facebook.com/lpsamarinda", twitter:"https://x.com/lpsamarinda", youtube:"https://www.youtube.com/@humaslsamda5240", tiktok:"https://www.tiktok.com/@lapas.samarinda", whatsapp:"https://api.whatsapp.com/send/?phone=6282333332984&text&type=phone_number&app_absent=0" } },
-  { id:8,  name:"Lembaga Pemasyarakatan Kelas IIA Tenggarong",         type:"lapas",  city:"Tenggarong, Kutai Kartanegara", phone:"(0541) 661014", lat:-0.427848, lng:116.964846, gmapsQuery:"Lembaga Pemasyarakatan Kelas IIA Tenggarong Kutai Kartanegara",   visitHours:"Senin–Kamis: 08.00–15.00\nJumat: 08.00–11.30\nSabtu: 08.00–14.00", photo:null, social:{ instagram:"https://www.instagram.com/lapsterbaik/", facebook:"https://www.facebook.com/LapasTenggarong", twitter:"https://x.com/lapsterbaik", youtube:"https://www.youtube.com/@lapsterbaik6558", tiktok:"https://www.tiktok.com/@lapas_tenggarong", whatsapp:"https://api.whatsapp.com/send/?phone=628115695656&text&type=phone_number&app_absent=0" } },
-  { id:9,  name:"Lembaga Pemasyarakatan Perempuan Kelas IIA Tenggarong",type:"lpp",   city:"Tenggarong, Kutai Kartanegara", phone:"0823-4500-7979", lat:-0.421516, lng:116.988930, gmapsQuery:"Lembaga Pemasyarakatan Perempuan Kelas IIA Tenggarong",           visitHours:"Selasa–Rabu: 09.00–11.30 & 13.00–14.00\nSabtu: 09.00–11.00",     photo:null, social:{ instagram:"https://www.instagram.com/lpp_tenggarong/", facebook:"https://www.facebook.com/lpp.samarinda", twitter:"https://x.com/LppTenggarong", youtube:"https://www.youtube.com/@lpp_tenggarong79", tiktok:"https://www.tiktok.com/@lpptgr", whatsapp:"https://api.whatsapp.com/send/?phone=6282345007979&text&type=phone_number&app_absent=0" } },
-  { id:10, name:"Rumah Tahanan Kelas IIA Balikpapan",                  type:"rutan",  city:"Balikpapan",                   phone:"(0542) 764407",  lat:-1.274166, lng:116.866080, gmapsQuery:"Rumah Tahanan Kelas IIA Balikpapan",                              visitHours:"Senin–Kamis: 08.00–15.00\nJumat: 08.00–12.00\nSabtu: 08.00–13.30", photo:null, social:{ instagram:"https://www.instagram.com/rutanbalikpapan/", facebook:"https://www.facebook.com/profile.php?id=100070053785887", twitter:"https://x.com/RutanBalikpapan", youtube:"https://www.youtube.com/@rutanbalikpapan7997", tiktok:"https://www.tiktok.com/@rutan.balikpapan", whatsapp:"https://api.whatsapp.com/send/?phone=6282254816532&text&type=phone_number&app_absent=0" } },
-  { id:11, name:"Balai Pemasyarakatan Kelas I Samarinda",              type:"bapas",  city:"Samarinda",                   phone:"(0541) 739198",  lat:-0.461515, lng:117.112992, gmapsQuery:"Balai Pemasyarakatan Kelas I Samarinda",                          visitHours:"Senin–Kamis: 07.30–12.00 & 13.00–16.00\nJumat: 07.30–11.30 & 13.00–16.30", photo:null, social:{ instagram:"https://www.instagram.com/bapas_samarinda/", facebook:"https://www.facebook.com/profile.php?id=61585370501549", twitter:"https://x.com/bapassamarinda", youtube:"https://www.youtube.com/@balaipemasyarakatansamarin7959", tiktok:"https://www.tiktok.com/@baperinda01", whatsapp:"https://api.whatsapp.com/send/?phone=6282254356508&text&type=phone_number&app_absent=0" } },
-  { id:12, name:"Rumah Tahanan Kelas I Samarinda",                     type:"rutan",  city:"Samarinda",                   phone:"(0541) 251261",  lat:-0.447556, lng:117.154273, gmapsQuery:"Rumah Tahanan Kelas I Samarinda",                                 visitHours:"Selasa & Kamis: 09.00–11.00\nSabtu: 09.00–11.30 & 13.30–15.00",  photo:null, social:{ instagram:"https://www.instagram.com/rutan.samarinda/", facebook:"https://www.facebook.com/rutan.samarinda.2025", twitter:"https://x.com/RutanSamarinda", youtube:"https://www.youtube.com/@rutankelasiiasamarinda9034", tiktok:"https://www.tiktok.com/@rutan.samarinda", whatsapp:"https://api.whatsapp.com/send/?phone=6281312076175&text&type=phone_number&app_absent=0" } },
-  { id:13, name:"Lembaga Pemasyarakatan Narkotika Kelas IIA Samarinda",type:"lpn",    city:"Samarinda",                   phone:"(0541) 2523777", lat:-0.398707, lng:117.164466, gmapsQuery:"Lembaga Pemasyarakatan Narkotika Kelas IIA Samarinda",              visitHours:"Senin, Rabu, Kamis & Sabtu: 09.00–14.30",                         photo:null, social:{ instagram:"https://www.instagram.com/lapasnarkotika_samarinda/", facebook:"https://www.facebook.com/lapasnarkotikasmd", twitter:"https://x.com/lpnarkotika_smd", youtube:"https://www.youtube.com/@lapasnarkotikasamarinda", tiktok:"https://www.tiktok.com/@lpnarkotika_smd_official", whatsapp:"https://api.whatsapp.com/send/?phone=6282253333788&text&type=phone_number&app_absent=0" } },
-  { id:14, name:"Lembaga Pemasyarakatan Kelas IIA Bontang",            type:"lapas",  city:"Bontang",                     phone:"0811-598-2992",  lat:0.056291,  lng:117.460207, gmapsQuery:"Lembaga Pemasyarakatan Kelas IIA Bontang",                        visitHours:"Senin–Kamis: 09.00–11.00\nSabtu: 13.30–14.00",                    photo:null, social:{ instagram:"https://www.instagram.com/lapas_bontang/", facebook:"https://www.facebook.com/LapasBontangGemilang", twitter:"https://x.com/LP_Bontang", youtube:"https://www.youtube.com/@lapasbontanggemilang7737", tiktok:null, whatsapp:"https://api.whatsapp.com/send/?phone=6282296895220&text&type=phone_number&app_absent=0" } },
-  { id:15, name:"Lembaga Pemasyarakatan Kelas IIA Tarakan",            type:"lapas",  city:"Tarakan, Kalimantan Utara",   phone:"0813-4870-9450", lat:3.307884,  lng:117.590388, gmapsQuery:"Lembaga Pemasyarakatan Kelas IIA Tarakan",                        visitHours:"Senin–Minggu: 09.00–12.00",                                        photo:null, social:{ instagram:"https://www.instagram.com/lapastarakan/", facebook:"https://www.facebook.com/LapasTarakan", twitter:"https://x.com/LPTarakan1", youtube:"https://www.youtube.com/@lapastarakan50", tiktok:"https://www.tiktok.com/@lapastarakan", whatsapp:"https://api.whatsapp.com/send/?phone=6281348709450&text&type=phone_number&app_absent=0" } },
-  { id:16, name:"Lembaga Pemasyarakatan Kelas IIB Nunukan",            type:"lapas",  city:"Nunukan, Kalimantan Utara",   phone:"0821-4802-7570", lat:4.042791,  lng:117.722943, gmapsQuery:"Lembaga Pemasyarakatan Kelas IIB Nunukan",                        visitHours:"Senin–Sabtu: 08.00–15.00",                                        photo:null, social:{ instagram:"https://www.instagram.com/lapas_nunukan/", facebook:"https://www.facebook.com/LapasKelasIIBNunukan", twitter:"https://x.com/lapas_nunukan", youtube:"https://www.youtube.com/@lapaskelasiibnunukan714", tiktok:"https://www.tiktok.com/@lapas_nunukan", whatsapp:"https://api.whatsapp.com/send/?phone=6282148027570&text&type=phone_number&app_absent=0" } },
-  { id:17, name:"Balai Pemasyarakatan Kelas II Tarakan",               type:"bapas",  city:"Tarakan, Kalimantan Utara",   phone:"0851-1747-0063", lat:3.307978,  lng:117.589367, gmapsQuery:"Balai Pemasyarakatan Kelas II Tarakan",                          visitHours:"Senin–Kamis: 07.30–15.00\nJumat: 07.30–15.30",                    photo:null, social:{ instagram:"https://www.instagram.com/bapas_tarakan/", facebook:"https://www.facebook.com/profile.php?id=100069139782689", twitter:"https://x.com/bapas_tarakan", youtube:"https://www.youtube.com/@bapastarakan", tiktok:"https://www.tiktok.com/@bapas_tarakan", whatsapp:"https://api.whatsapp.com/send/?phone=6285117470063&text&type=phone_number&app_absent=0" } },
-];
+// ── GOOGLE SHEETS DATA SOURCE ──────────────────────────────────────────────
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKueAYOMUQ5THbJF-k6cE52r2b3RGBgc1OTOv9_kSqkfTmaEfo3yCxB35ZoLsf-6INvXuQiHMBvKgK/pub?gid=43282257&single=true&output=csv';
+
+// Parse CSV text → array of row objects keyed by header
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+  return lines.slice(1).map(line => {
+    // Handle quoted fields that may contain commas
+    const cols = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { cols.push(cur); cur = ''; }
+      else { cur += ch; }
+    }
+    cols.push(cur);
+    const row = {};
+    headers.forEach((h, i) => { row[h] = (cols[i] || '').trim(); });
+    return row;
+  });
+}
+
+// Convert a parsed CSV row → facility object
+function rowToFacility(row) {
+  return {
+    id:         parseInt(row.id),
+    name:       row.name,
+    type:       row.type,
+    city:       row.city,
+    phone:      row.phone || '—',
+    lat:        parseFloat(row.lat),
+    lng:        parseFloat(row.lng),
+    visitHours: (row.visitHours || '').replace(/\|/g, '\n'),
+    gmapsQuery: row.gmapsQuery,
+    photo:      row.photo || null,
+    social: {
+      instagram: row.instagram || null,
+      facebook:  row.facebook  || null,
+      twitter:   row.twitter   || null,
+      youtube:   row.youtube   || null,
+      tiktok:    row.tiktok    || null,
+      whatsapp:  row.whatsapp  || null,
+    }
+  };
+}
+
+let facilities = [];
 
 // ── TYPE CONFIG ────────────────────────────────────────────────────────────
 const typeConfig = {
@@ -490,6 +519,9 @@ L.control.zoom({ position:'topright' }).addTo(map);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
   maxZoom: 20, subdomains: 'abcd', attribution: '&copy; CARTO'
 }).addTo(map);
+
+// ── FETCH DATA FROM GOOGLE SHEETS THEN INIT ────────────────────────────────
+function initMap(facilities) {
 
 // ── DYNAMIC CITY GROUPS (Interpolasi Posisi) ────────────────────────────────
 const cityGroups = [
@@ -685,7 +717,7 @@ function applyFilters() {
   document.getElementById('shown-count').textContent = count;
 }
 
-// ── RESET ZOOM & AUTO-FIT LAYAR ────────────────────────────────────────────
+// ── Reset zoom ─────────────────────────────────────────────────────────────
 const resetZoomBtn = document.getElementById('resetZoomBtn');
 const ALL_BOUNDS = L.latLngBounds(facilities.map(f => [f.lat, f.lng]));
 
@@ -693,9 +725,56 @@ map.fitBounds(ALL_BOUNDS, { padding: [30, 30] });
 
 resetZoomBtn.addEventListener('click', () => {
   closeSearchPanel();
-  map.closePopup(); 
+  map.closePopup();
   map.flyToBounds(ALL_BOUNDS, { padding: [30, 30], animate: true, duration: 1.2 });
 });
+
+} // ── END initMap ────────────────────────────────────────────────────────────
+
+// ── LOADING SCREEN ─────────────────────────────────────────────────────────
+const loadingEl = document.createElement('div');
+loadingEl.id = 'loadingScreen';
+loadingEl.innerHTML = `
+  <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+    <div style="width:44px;height:44px;border:4px solid rgba(201,162,39,.3);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;">Memuat Data...</div>
+    <div style="font-size:.75rem;color:var(--text-dim);">Mengambil data dari Google Sheets</div>
+  </div>`;
+Object.assign(loadingEl.style, {
+  position:'absolute', inset:'0', zIndex:'9999',
+  background:'rgba(15,32,53,0.92)', backdropFilter:'blur(4px)',
+  display:'flex', alignItems:'center', justifyContent:'center',
+});
+document.querySelector('.main').appendChild(loadingEl);
+
+// Add spin keyframe
+const styleEl = document.createElement('style');
+styleEl.textContent = `@keyframes spin { to { transform: rotate(360deg); } }`;
+document.head.appendChild(styleEl);
+
+// ── FETCH & LAUNCH ─────────────────────────────────────────────────────────
+fetch(SHEET_CSV_URL)
+  .then(res => {
+    if (!res.ok) throw new Error('Gagal mengambil data');
+    return res.text();
+  })
+  .then(csv => {
+    facilities = parseCSV(csv).map(rowToFacility).filter(f => f.id && !isNaN(f.lat));
+    document.getElementById('shown-count').textContent = facilities.length;
+    loadingEl.remove();
+    initMap(facilities);
+  })
+  .catch(err => {
+    loadingEl.innerHTML = `
+      <div style="text-align:center;padding:24px;">
+        <div style="font-size:2rem;margin-bottom:12px;">⚠️</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;color:#f87171;margin-bottom:8px;">Gagal Memuat Data</div>
+        <div style="font-size:.8rem;color:var(--text-dim);margin-bottom:16px);">${err.message}</div>
+        <div style="font-size:.75rem;color:var(--text-dim);">Pastikan Google Sheet sudah di-publish<br>dan koneksi internet aktif.</div>
+        <button onclick="location.reload()" style="margin-top:16px;padding:8px 20px;background:var(--gold);color:#0f2035;border:none;border-radius:20px;font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;text-transform:uppercase;">Coba Lagi</button>
+      </div>`;
+    console.error('Sheet fetch error:', err);
+  });
 
 </script>
 </body>
