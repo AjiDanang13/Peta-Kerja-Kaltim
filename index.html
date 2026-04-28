@@ -753,11 +753,24 @@ styleEl.textContent = `@keyframes spin { to { transform: rotate(360deg); } }`;
 document.head.appendChild(styleEl);
 
 // ── FETCH & LAUNCH ─────────────────────────────────────────────────────────
-fetch(SHEET_CSV_URL)
-  .then(res => {
-    if (!res.ok) throw new Error('Gagal mengambil data');
-    return res.text();
-  })
+// Try direct first, fall back to CORS proxies if blocked
+const PROXIES = [
+  url => url,                                                          // direct
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,          // proxy 1
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, // proxy 2
+];
+
+async function fetchWithFallback(url) {
+  for (const proxy of PROXIES) {
+    try {
+      const res = await fetch(proxy(url), { cache: 'no-store' });
+      if (res.ok) return await res.text();
+    } catch(e) { /* try next */ }
+  }
+  throw new Error('Semua koneksi gagal');
+}
+
+fetchWithFallback(SHEET_CSV_URL)
   .then(csv => {
     facilities = parseCSV(csv).map(rowToFacility).filter(f => f.id && !isNaN(f.lat));
     document.getElementById('shown-count').textContent = facilities.length;
@@ -769,7 +782,7 @@ fetch(SHEET_CSV_URL)
       <div style="text-align:center;padding:24px;">
         <div style="font-size:2rem;margin-bottom:12px;">⚠️</div>
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;color:#f87171;margin-bottom:8px;">Gagal Memuat Data</div>
-        <div style="font-size:.8rem;color:var(--text-dim);margin-bottom:16px);">${err.message}</div>
+        <div style="font-size:.8rem;color:var(--text-dim);margin-bottom:16px;">${err.message}</div>
         <div style="font-size:.75rem;color:var(--text-dim);">Pastikan Google Sheet sudah di-publish<br>dan koneksi internet aktif.</div>
         <button onclick="location.reload()" style="margin-top:16px;padding:8px 20px;background:var(--gold);color:#0f2035;border:none;border-radius:20px;font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;text-transform:uppercase;">Coba Lagi</button>
       </div>`;
