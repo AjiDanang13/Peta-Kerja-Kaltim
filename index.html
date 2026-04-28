@@ -41,22 +41,22 @@
       background:radial-gradient(circle,rgba(201,162,39,.1) 0%,transparent 70%);
       pointer-events:none;
     }
-    /* Logo Kemenimipas */
     .logo-shield {
-      width: 44px; height: 44px; flex-shrink: 0;
+      width: 1.6em; height: 1.6em; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
       transition: all 0.3s ease;
-      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Logo_Kementrian_Imigrasi_dan_Pemasyarakatan_%282024%29.png/1280px-Logo_Kementrian_Imigrasi_dan_Pemasyarakatan_%282024%29.png');
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Logo_Kementrian_Imigrasi_dan_Pemasyarakatan_%282024%29.png/1280px-Logo_Kementrian_Imigrasi_dan_Pemasyarakatan_%282024%29.png?_=20241130141828');
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
     }
-    
+    .logo-shield::after { content: ''; }
     .header-text h1 {
       font-family:'Barlow Condensed',sans-serif; font-size:1.15rem; font-weight:800;
       color:var(--gold); letter-spacing:.5px; line-height:1.1; text-transform:uppercase;
     }
     .header-text p { font-size:.7rem; color:var(--text-dim); margin-top:2px; }
+    .title-mobile { display: none; }
     
     .header-stats { margin-left:auto; display:flex; gap:16px; align-items:center; flex-shrink:0; }
     .stat-box { text-align:center; }
@@ -68,22 +68,25 @@
     #map  { width:100%; height:100%; z-index:1; }
 
     /* ══════════════════════════════════════════════════════
-       FLOATING ACTION BUTTON (FAB) SEARCH - BOTTOM LEFT
+       FLOATING ACTION BUTTON (FAB) SEARCH - BOTTOM CENTER
     ══════════════════════════════════════════════════════ */
     #searchToggle {
       position: absolute;
       bottom: 24px; left: 14px;
+      transform: translateX(0) scale(1);
       z-index: 800;
       display: flex; align-items: center; justify-content: center;
-      width: 52px; height: 52px;
+      width: 48px; height: 48px;
       background: var(--gold); color: #0f2035;
-      border-radius: 16px;
+      border-radius: 14px;
       cursor: pointer; user-select: none;
       box-shadow: 0 4px 20px rgba(0,0,0,0.35);
-      transition: background .2s, transform .15s;
-      font-size: 22px;
+      transition: background .2s, box-shadow .2s, transform .15s;
     }
-    #searchToggle:active { transform: scale(.92); }
+    #searchToggle:active { transform: scale(.95); }
+    #searchToggle .arrow { transition: transform .25s; display:inline-block; font-style:normal; }
+    #searchToggle.open .arrow { transform:rotate(180deg); }
+    #searchToggle.open { background:var(--gold2); }
 
     /* ══════════════════════════════════════════════════════
        SLIDE-UP SEARCH PANEL (BOTTOM CENTERED)
@@ -99,6 +102,7 @@
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
       overflow: hidden;
       
+      /* Animasi dari bawah */
       max-height: 0; opacity: 0; pointer-events: none;
       transform: translateX(-50%) translateY(20px);
       transform-origin: bottom center;
@@ -237,11 +241,11 @@
 
     /* ── RESPONSIVE MOBILE FIXES ── */
     @media(max-width:640px) {
-      header { padding: 8px 14px; gap: 10px; }
-      .logo-shield { width: 34px; height: 34px; }
-      .header-text h1 { font-size: 0.95rem; white-space: normal; line-height: 1.2; }
-      .header-text p { font-size: 0.65rem; }
-      .header-stats { display: none !important; }
+      header { padding: 6px 14px; gap: 10px; }
+      .logo-shield { width: 2.2em; height: 2.2em; background-size: contain; }
+      .logo-shield::after { content: ''; }
+      .title-desktop, .subtitle-desktop, .header-stats { display: none !important; }
+      .title-mobile { display: block; font-size: 1.25rem; margin: 0; color: var(--gold); letter-spacing: .5px; }
     }
 
     /* ── RESET ZOOM BUTTON (Bottom Right) ── */
@@ -291,12 +295,12 @@
 <header>
   <div class="logo-shield"></div>
   <div class="header-text">
-    <h1>Direktorat Jenderal Pemasyarakatan Kalimantan Timur</h1>
-    <p>Kementerian Imigrasi dan Pemasyarakatan</p>
+    <h1 class="title">Direktorat Jenderal Pemasyarakatan Kalimantan Timur</h1>
+    <p class="subtitle">Kementerian Imigrasi dan Pemasyarakatan</p>
   </div>
   <div class="header-stats">
-    <div class="stat-box"><div class="num" id="shown-count">0</div><div class="lbl">Tampil</div></div>
-    <div class="stat-box"><div class="num" id="total-count">0</div><div class="lbl">Total UPT</div></div>
+    <div class="stat-box"><div class="num" id="shown-count">17</div><div class="lbl">Tampil</div></div>
+    <div class="stat-box"><div class="num">17</div><div class="lbl">Total UPT</div></div>
   </div>
 </header>
 
@@ -317,7 +321,7 @@
     <div class="panel-inner">
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="Cari nama UPT atau kota..."
+        <input type="text" id="searchInput" placeholder="Cari nama UPT"
                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       </div>
       <div class="filter-pills">
@@ -348,80 +352,58 @@ const SVG = {
   gmaps:`<svg viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`,
 };
 
+
 // ── GOOGLE SHEETS DATA SOURCE ──────────────────────────────────────────────
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKueAYOMUQ5THbJF-k6cE52r2b3RGBgc1OTOv9_kSqkfTmaEfo3yCxB35ZoLsf-6INvXuQiHMBvKgK/pub?gid=43282257&single=true&output=csv';
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKueAYOMUQ5THbJF-k6cE52r2b3RGBgc1OTOv9_kSqkfTmaEfo3yCxB35ZoLsf-6INvXuQiHMBvKgK/pub?output=csv';
 
-// ROBUST CSV PARSER (Tahan Typo Kolom & Enter di Excel)
-function parseCSV(str) {
-    const arr =[];
-    let quote = false;
-    let row = 0, col = 0;
-    for (let c = 0; c < str.length; c++) {
-        let cc = str[c], nc = str[c+1];
-        arr[row] = arr[row] || [];
-        arr[row][col] = arr[row][col] || '';
-
-        if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
-        if (cc == '"') { quote = !quote; continue; }
-        if (cc == ',' && !quote) { ++col; continue; }
-        if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
-        if (cc == '\n' && !quote) { ++row; col = 0; continue; }
-        if (cc == '\r' && !quote) { ++row; col = 0; continue; }
-
-        arr[row][col] += cc;
+// Parse CSV → array of row objects
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
+  return lines.slice(1).filter(l => l.trim()).map(line => {
+    const cols = [];
+    let cur = '', inQ = false;
+    for (const ch of line) {
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { cols.push(cur); cur = ''; }
+      else cur += ch;
     }
-    
-    const headers = arr[0].map(h => h.trim().replace(/^\uFEFF/, '').toLowerCase());
-    return arr.slice(1).filter(r => r.some(x => x)).map(rowArr => {
-        const obj = {};
-        headers.forEach((h, i) => { obj[h] = (rowArr[i] || '').trim(); });
-        return obj;
-    });
+    cols.push(cur);
+    const row = {};
+    headers.forEach((h, i) => row[h] = (cols[i] || '').trim());
+    return row;
+  });
 }
 
-// Convert a parsed CSV row → facility object (Dengan Fallback Super Aman)
+// Convert CSV row → facility object
 function rowToFacility(row) {
-  const getVal = (k) => {
-    // Cari nama kolom di sheet, tidak peduli ada spasi atau beda kapitalisasi
-    const key = Object.keys(row).find(x => x.toLowerCase().trim() === k.toLowerCase());
-    return key ? (row[key] || '').toString().trim() : '';
-  };
-
-  let rawType = getVal('type').toLowerCase();
-  let safeType = 'lapas'; // Default aman jika kosong/salah
-
-  // Deteksi Tipe (Bahkan jika di Excel ditulis "Lapas Perempuan" atau "BAPAS KELAS I")
-  if (rawType.includes('rutan')) safeType = 'rutan';
-  else if (rawType.includes('lpp') || rawType.includes('perempuan')) safeType = 'lpp';
-  else if (rawType.includes('lpka') || rawType.includes('anak')) safeType = 'lpka';
-  else if (rawType.includes('lpn') || rawType.includes('narkotika')) safeType = 'lpn';
-  else if (rawType.includes('bapas')) safeType = 'bapas';
-  else if (rawType.includes('kanwil')) safeType = 'kanwil';
-
+  const type = (row.type || '').trim().toLowerCase();
   return {
-    id:         parseInt(getVal('id')) || Math.floor(Math.random() * 1000000),
-    name:       getVal('name') || 'UPT Tanpa Nama',
-    type:       safeType,
-    city:       getVal('city') || '',
-    phone:      getVal('phone') || '—',
-    lat:        parseFloat(getVal('lat')),
-    lng:        parseFloat(getVal('lng')),
-    visitHours: getVal('visithours').replace(/\|/g, '\n'),
-    gmapsQuery: getVal('gmapsquery') || getVal('name'),
-    photo:      getVal('photo') || null,
+    id:         parseInt(row.id),
+    name:       (row.name || '').trim(),
+    type:       type,
+    city:       (row.city || '').trim(),
+    phone:      (row.phone || '—').trim(),
+    lat:        parseFloat(row.lat),
+    lng:        parseFloat(row.lng),
+    visitHours: (row.visitHours || '').replace(/\|/g, '\n').trim(),
+    gmapsQuery: (row.gmapsQuery || '').trim(),
+    photo:      (row.photo || '').trim() || null,
     social: {
-      instagram: getVal('instagram') || null,
-      facebook:  getVal('facebook')  || null,
-      twitter:   getVal('twitter')   || null,
-      youtube:   getVal('youtube')   || null,
-      tiktok:    getVal('tiktok')    || null,
-      whatsapp:  getVal('whatsapp')  || null,
+      instagram: (row.instagram || '').trim() || null,
+      facebook:  (row.facebook  || '').trim() || null,
+      twitter:   (row.twitter   || '').trim() || null,
+      youtube:   (row.youtube   || '').trim() || null,
+      tiktok:    (row.tiktok    || '').trim() || null,
+      whatsapp:  (row.whatsapp  || '').trim() || null,
     }
   };
 }
 
-let facilities =[]; // Data akan diisi bersih 100% dari Sheets
+// Facilities will be populated by fetch
+let facilities = [];
 
+function initMap() {
 // ── TYPE CONFIG ────────────────────────────────────────────────────────────
 const typeConfig = {
   lapas: { color:'#4a9ede', label:'LAPAS',  letter:'L' },
@@ -441,8 +423,7 @@ const typeLabel = {
 
 // ── MAKE PIN ICON ────────────────────────────────────────────
 function makeIcon(f, active = false) {
-  // Pengaman ekstra: Jika tipe entah bagaimana masih kosong, gunakan 'lapas'
-  const c = typeConfig[f.type] || typeConfig['lapas']; 
+  const c   = typeConfig[f.type];
   const W   = active ? 48 : 36;
   const TH  = active ? 12 : 9;
   const bw  = active ? 2.5 : 2;
@@ -477,7 +458,7 @@ function makeIcon(f, active = false) {
 
 // ── SOCIAL ICONS HTML ──────────────────────────────────────────────────────
 function socialIconsHtml(social) {
-  return[
+  return [
     { key:'instagram', cls:'instagram', title:'Instagram' },
     { key:'facebook',  cls:'facebook',  title:'Facebook'  },
     { key:'twitter',   cls:'twitter',   title:'X (Twitter)' },
@@ -494,8 +475,7 @@ function socialIconsHtml(social) {
 
 // ── POPUP CONTENT BUILDER ──────────────────────────────────────────────────
 function buildPopupContent(f) {
-  // Pengaman ekstra: fallback ke 'lapas' jika config kosong
-  const cfg = typeConfig[f.type] || typeConfig['lapas']; 
+  const cfg  = typeConfig[f.type];
   const isIOS = /iP(hone|od|ad)/.test(navigator.userAgent);
   const isAndroid = /Android/.test(navigator.userAgent);
   let gurl;
@@ -511,7 +491,7 @@ function buildPopupContent(f) {
     <div class="popup-header">
       <div class="popup-type-row">
         <div class="popup-type-dot" style="background:${cfg.color}"></div>
-        <span class="popup-type-text">${typeLabel[f.type] || 'UPT Pemasyarakatan'} · ${f.city}</span>
+        <span class="popup-type-text">${typeLabel[f.type]} · ${f.city}</span>
       </div>
       <div class="popup-name">${f.name}</div>
     </div>
@@ -542,282 +522,284 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r
   maxZoom: 20, subdomains: 'abcd', attribution: '&copy; CARTO'
 }).addTo(map);
 
-// ── INIT MAP FUNCTION (Dipanggil setelah data terambil) ────────────────────
-function initMap() {
+// ── DYNAMIC CITY GROUPS (Interpolasi Posisi) ────────────────────────────────
+const cityGroups = [
+  { key:'samarinda',     label:'Samarinda',    count:5, offsetLat:-0.600, offsetLng:117.250, trueLat:-0.460, trueLng:117.138, zoom:13, ids:[1,7,11,12,13] },
+  { key:'balikpapan',    label:'Balikpapan',   count:3, offsetLat:-1.274, offsetLng:116.865, trueLat:-1.274, trueLng:116.865, zoom:13, ids:[3,5,10] },
+  { key:'tenggarong',    label:'Tenggarong',   count:3, offsetLat:-0.320, offsetLng:116.700, trueLat:-0.423, trueLng:116.980, zoom:13, ids:[4,8,9] },
+  { key:'tanah_grogot',  label:'Tanah Grogot', count:1, offsetLat:-1.879, offsetLng:116.176, trueLat:-1.879, trueLng:116.176, zoom:14, ids:[2] },
+  { key:'tanjung_redeb', label:'Tanjung Redeb',count:1, offsetLat: 2.138, offsetLng:117.498, trueLat: 2.138, trueLng:117.498, zoom:14, ids:[6] },
+  { key:'bontang',       label:'Bontang',      count:1, offsetLat: 0.056, offsetLng:117.460, trueLat: 0.056, trueLng:117.460, zoom:14, ids:[14] },
+  { key:'nunukan',       label:'Nunukan',      count:1, offsetLat: 4.042, offsetLng:117.722, trueLat: 4.042, trueLng:117.722, zoom:14, ids:[16] },
+  { key:'tarakan',       label:'Tarakan',      count:2, offsetLat: 3.307, offsetLng:117.590, trueLat: 3.307, trueLng:117.590, zoom:14, ids:[15,17] },
+];
 
-  // Update Header Stats
-  document.getElementById('shown-count').textContent = facilities.length;
-  document.getElementById('total-count').textContent = facilities.length;
+let activeId = null;
+const ZOOM_THRESHOLD = 11; // Di bawah level ini = Tampil Grup. Di atas level ini = Tampil Pin individu.
 
-  // ── DYNAMIC CITY GROUPS (ID & Count Otomatis) ─────────────────────────
-  const cityGroups =[
-    { key:'samarinda',     label:'Samarinda',    offsetLat:-0.600, offsetLng:117.250, trueLat:-0.460, trueLng:117.138, zoom:13 },
-    { key:'balikpapan',    label:'Balikpapan',   offsetLat:-1.274, offsetLng:116.865, trueLat:-1.274, trueLng:116.865, zoom:13 },
-    { key:'tenggarong',    label:'Tenggarong',   offsetLat:-0.320, offsetLng:116.700, trueLat:-0.423, trueLng:116.980, zoom:13 },
-    { key:'tanah_grogot',  label:'Tanah Grogot', offsetLat:-1.879, offsetLng:116.176, trueLat:-1.879, trueLng:116.176, zoom:14 },
-    { key:'tanjung_redeb', label:'Tanjung Redeb',offsetLat: 2.138, offsetLng:117.498, trueLat: 2.138, trueLng:117.498, zoom:14 },
-    { key:'bontang',       label:'Bontang',      offsetLat: 0.056, offsetLng:117.460, trueLat: 0.056, trueLng:117.460, zoom:14 },
-    { key:'nunukan',       label:'Nunukan',      offsetLat: 4.042, offsetLng:117.722, trueLat: 4.042, trueLng:117.722, zoom:14 },
-    { key:'tarakan',       label:'Tarakan',      offsetLat: 3.307, offsetLng:117.590, trueLat: 3.307, trueLng:117.590, zoom:14 },
-  ];
+function makeCityGroupIcon(group) {
+  return L.divIcon({
+    html: `<div class="city-cluster-compact">${group.count}</div>`,
+    className: '', iconSize: [36, 36], iconAnchor: [18, 18]
+  });
+}
 
-  // Auto-mapping berdasarkan nama kota di Google Sheets
+// Inisialisasi Marker Grup
+cityGroups.forEach(group => {
+  const m = L.marker([group.offsetLat, group.offsetLng], {
+    icon: makeCityGroupIcon(group),
+    zIndexOffset: 200,
+  }).bindTooltip(group.label, { 
+    className: 'cluster-tooltip', direction: 'top', offset: [0, -18], opacity: 1 
+  });
+  
+  m.on('click', e => {
+    L.DomEvent.stopPropagation(e);
+    const groupFacilities = facilities.filter(f => group.ids.includes(f.id));
+    const groupBounds = L.latLngBounds(groupFacilities.map(f => [f.lat, f.lng]));
+    map.flyToBounds(groupBounds, { padding: [50, 50], maxZoom: 14, animate: true, duration: 1.0 });
+  });
+  group._marker = m;
+});
+
+// Inisialisasi Marker Pin
+const markers = {};
+facilities.forEach(f => {
+  const m = L.marker([f.lat, f.lng], { icon: makeIcon(f) })
+    .bindPopup(buildPopupContent(f), { maxWidth:300, minWidth:280 });
+  m.on('click', e => { L.DomEvent.stopPropagation(e); selectFacility(f.id); });
+  markers[f.id] = m;
+});
+
+// ── LOGIKA POSISI DINAMIS & VISIBILITAS ──
+function updateGroupPositions() {
+  const z = map.getZoom();
+  
+  // Interpolasi Posisi: Zoom 6.5 = Offset (Menjauh). Zoom 10 = Posisi Asli (True).
+  let t = (z - 6.5) / (10 - 6.5);
+  if (t < 0) t = 0;
+  if (t > 1) t = 1;
+  t = t * t * (3 - 2 * t); // Smoothstep
+
+  const showBubbles = (z < ZOOM_THRESHOLD);
+
   cityGroups.forEach(g => {
-    const matches = facilities.filter(f => f.city.toLowerCase().includes(g.label.toLowerCase()));
-    g.ids = matches.map(m => m.id);
-    g.count = matches.length;
-  });
-
-  let activeId = null;
-  const ZOOM_THRESHOLD = 11; // Di bawah level ini = Tampil Grup. Di atas level ini = Tampil Pin individu.
-
-  function makeCityGroupIcon(group) {
-    return L.divIcon({
-      html: `<div class="city-cluster-compact">${group.count}</div>`,
-      className: '', iconSize:[36, 36], iconAnchor: [18, 18]
-    });
-  }
-
-  // Inisialisasi Marker Grup
-  const activeGroups = cityGroups.filter(g => g.count > 0); // Hanya tampilkan jika grup punya isinya
-  activeGroups.forEach(group => {
-    const m = L.marker([group.offsetLat, group.offsetLng], {
-      icon: makeCityGroupIcon(group),
-      zIndexOffset: 200,
-    }).bindTooltip(group.label, { 
-      className: 'cluster-tooltip', direction: 'top', offset: [0, -18], opacity: 1 
-    });
-    
-    m.on('click', e => {
-      L.DomEvent.stopPropagation(e);
-      const groupFacilities = facilities.filter(f => group.ids.includes(f.id));
-      const groupBounds = L.latLngBounds(groupFacilities.map(f => [f.lat, f.lng]));
-      map.flyToBounds(groupBounds, { padding:[50, 50], maxZoom: 14, animate: true, duration: 1.0 });
-    });
-    group._marker = m;
-  });
-
-  // Inisialisasi Marker Pin
-  const markers = {};
-  facilities.forEach(f => {
-    const m = L.marker([f.lat, f.lng], { icon: makeIcon(f) })
-      .bindPopup(buildPopupContent(f), { maxWidth:300, minWidth:280 });
-    m.on('click', e => { L.DomEvent.stopPropagation(e); selectFacility(f.id); });
-    markers[f.id] = m;
-  });
-
-  // ── LOGIKA POSISI DINAMIS & VISIBILITAS ──
-  function updateGroupPositions() {
-    const z = map.getZoom();
-    
-    let t = (z - 6.5) / (10 - 6.5);
-    if (t < 0) t = 0;
-    if (t > 1) t = 1;
-    t = t * t * (3 - 2 * t); 
-
-    const showBubbles = (z < ZOOM_THRESHOLD);
-
-    activeGroups.forEach(g => {
-      if (g._marker) {
-        const lat = g.offsetLat * (1 - t) + g.trueLat * t;
-        const lng = g.offsetLng * (1 - t) + g.trueLng * t;
-        g._marker.setLatLng([lat, lng]);
-      }
-      if (showBubbles) {
-        if (!map.hasLayer(g._marker)) map.addLayer(g._marker);
-      } else {
-        if (map.hasLayer(g._marker)) map.removeLayer(g._marker);
-      }
-    });
-
-    facilities.forEach(f => {
-      const m = markers[f.id];
-      const inGroup = activeGroups.some(g => g.ids.includes(f.id));
-      const isVisible = !showBubbles || (activeId === f.id) || !inGroup; // Selalu tampilkan jika UPT tidak punya kota grup
-
-      if (isVisible) {
-        if (!map.hasLayer(m)) map.addLayer(m);
-      } else {
-        if (map.hasLayer(m)) map.removeLayer(m);
-      }
-    });
-  }
-
-  map.on('zoom', updateGroupPositions);
-  map.on('zoomend', updateGroupPositions);
-
-  // ── EVENTS ──
-  map.on('popupclose', () => {
-    if (activeId) {
-      const oldF = facilities.find(x => x.id === activeId);
-      if (oldF) markers[activeId].setIcon(makeIcon(oldF, false));
-      document.getElementById(`fi-${activeId}`)?.classList.remove('active');
-      activeId = null;
-      updateGroupPositions();
+    // Geser posisi
+    if (g._marker) {
+      const lat = g.offsetLat * (1 - t) + g.trueLat * t;
+      const lng = g.offsetLng * (1 - t) + g.trueLng * t;
+      g._marker.setLatLng([lat, lng]);
+    }
+    // Visibilitas Bubble
+    if (showBubbles) {
+      if (!map.hasLayer(g._marker)) map.addLayer(g._marker);
+    } else {
+      if (map.hasLayer(g._marker)) map.removeLayer(g._marker);
     }
   });
 
-  function selectFacility(id) {
-    if (activeId === id) { markers[id].openPopup(); return; }
-    if (activeId) map.closePopup();
+  // Visibilitas Pin Individu
+  facilities.forEach(f => {
+    const m = markers[f.id];
+    const isVisible = !showBubbles || (activeId === f.id);
+    if (isVisible) {
+      if (!map.hasLayer(m)) map.addLayer(m);
+    } else {
+      if (map.hasLayer(m)) map.removeLayer(m);
+    }
+  });
+}
 
-    activeId = id;
-    const f  = facilities.find(x => x.id === id);
+map.on('zoom', updateGroupPositions);
+map.on('zoomend', updateGroupPositions);
 
-    markers[id].setIcon(makeIcon(f, true));
-    document.getElementById(`fi-${id}`)?.classList.add('active');
-    document.getElementById(`fi-${id}`)?.scrollIntoView({ behavior:'smooth', block:'nearest' });
-    closeSearchPanel();
-
+// ── EVENTS ──
+map.on('popupclose', () => {
+  if (activeId) {
+    const oldF = facilities.find(x => x.id === activeId);
+    if (oldF) markers[activeId].setIcon(makeIcon(oldF, false));
+    document.getElementById(`fi-${activeId}`)?.classList.remove('active');
+    activeId = null;
     updateGroupPositions();
-
-    const zoom = Math.max(map.getZoom(), 15);
-    const pt   = map.project([f.lat, f.lng], zoom).subtract([0, 150]);
-    map.once('moveend', () => markers[id].openPopup());
-    map.flyTo(map.unproject(pt, zoom), zoom, { animate:true, duration:0.9 });
   }
+});
 
-  // ── SIDEBAR LIST ───────────────────────────────────────────────────────────
-  const listEl = document.getElementById('facilityList');
+function selectFacility(id) {
+  if (activeId === id) { markers[id].openPopup(); return; }
 
-  function renderList() {
-    listEl.innerHTML = '';
-    facilities.forEach(f => {
-      const c = typeConfig[f.type] || typeConfig['lapas'];
-      const em = typeEmoji[f.type] || '🏛';
+  if (activeId) map.closePopup();
 
-      const div = document.createElement('div');
-      div.className = 'facility-item';
-      div.id = `fi-${f.id}`;
-      div.dataset.type = f.type;
-      div.dataset.name = (f.name + ' ' + f.city).toLowerCase();
-      div.innerHTML = `<div class="fi-top">
-        <div class="fi-icon ${f.type}">${em}</div>
-        <div class="fi-info">
-          <div class="fi-name">${f.name}</div>
-          <div class="fi-city">${f.city}</div>
-        </div>
-        <span class="fi-badge ${f.type}">${c.label}</span>
-      </div>`;
-      div.addEventListener('click', e => {
-        e.stopPropagation();
-        selectFacility(f.id);
-      });
-      listEl.appendChild(div);
+  activeId = id;
+  const f  = facilities.find(x => x.id === id);
+
+  markers[id].setIcon(makeIcon(f, true));
+  document.getElementById(`fi-${id}`)?.classList.add('active');
+  document.getElementById(`fi-${id}`)?.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  closeSearchPanel();
+
+  updateGroupPositions();
+
+  const zoom = Math.max(map.getZoom(), 15);
+  const pt   = map.project([f.lat, f.lng], zoom).subtract([0, 150]);
+  map.once('moveend', () => markers[id].openPopup());
+  map.flyTo(map.unproject(pt, zoom), zoom, { animate:true, duration:0.9 });
+}
+
+// ── SIDEBAR LIST ───────────────────────────────────────────────────────────
+const listEl = document.getElementById('facilityList');
+
+function renderList() {
+  listEl.innerHTML = '';
+  facilities.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'facility-item';
+    div.id = `fi-${f.id}`;
+    div.dataset.type = f.type;
+    div.dataset.name = (f.name + ' ' + f.city).toLowerCase();
+    div.innerHTML = `<div class="fi-top">
+      <div class="fi-icon ${f.type}">${typeEmoji[f.type]}</div>
+      <div class="fi-info">
+        <div class="fi-name">${f.name}</div>
+        <div class="fi-city">${f.city}</div>
+      </div>
+      <span class="fi-badge ${f.type}">${typeConfig[f.type].label}</span>
+    </div>`;
+    div.addEventListener('click', e => {
+      e.stopPropagation();
+      selectFacility(f.id);
     });
-  }
-  renderList();
-
-  // ── SEARCH PANEL TOGGLE ────────────────────────────────────────────────────
-  const searchToggle = document.getElementById('searchToggle');
-  const searchPanel  = document.getElementById('searchPanel');
-
-  function closeSearchPanel() {
-    searchPanel.classList.remove('open');
-    searchToggle.classList.remove('open');
-  }
-
-  searchToggle.addEventListener('click', e => {
-    e.stopPropagation();
-    const isOpen = searchPanel.classList.toggle('open');
-    searchToggle.classList.toggle('open', isOpen);
+    listEl.appendChild(div);
   });
+}
+renderList();
 
-  map.on('click', closeSearchPanel);
+// ── SEARCH PANEL TOGGLE ────────────────────────────────────────────────────
+const searchToggle = document.getElementById('searchToggle');
+const searchPanel  = document.getElementById('searchPanel');
 
-  // ── SEARCH + FILTER ────────────────────────────────────────────────────────
-  let currentFilter = 'all';
+function closeSearchPanel() {
+  searchPanel.classList.remove('open');
+  searchToggle.classList.remove('open');
+}
 
-  document.getElementById('searchInput').addEventListener('input', applyFilters);
-  document.querySelectorAll('.pill').forEach(pill => {
-    pill.addEventListener('click', () => {
-      document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
-      currentFilter = pill.dataset.filter;
-      applyFilters();
-    });
+searchToggle.addEventListener('click', e => {
+  e.stopPropagation();
+  const isOpen = searchPanel.classList.toggle('open');
+  searchToggle.classList.toggle('open', isOpen);
+  // Don't auto-focus - user must tap the input field to open keyboard
+});
+
+map.on('click', closeSearchPanel);
+
+// ── SEARCH + FILTER ────────────────────────────────────────────────────────
+let currentFilter = 'all';
+
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.querySelectorAll('.pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    currentFilter = pill.dataset.filter;
+    applyFilters();
   });
+});
 
-  function applyFilters() {
-    const q = document.getElementById('searchInput').value.toLowerCase().trim();
-    let count = 0;
-    document.querySelectorAll('.facility-item').forEach(el => {
-      const ok = (currentFilter === 'all' || el.dataset.type === currentFilter)
-              && (!q || el.dataset.name.includes(q));
-      el.classList.toggle('hidden', !ok);
-      if (ok) count++;
-    });
-    document.getElementById('shown-count').textContent = count;
-  }
-
-  // ── Reset zoom ─────────────────────────────────────────────────────────────
-  const resetZoomBtn = document.getElementById('resetZoomBtn');
-  const ALL_BOUNDS = L.latLngBounds(facilities.map(f => [f.lat, f.lng]));
-
-  map.fitBounds(ALL_BOUNDS, { padding: [30, 30] });
-
-  resetZoomBtn.addEventListener('click', () => {
-    closeSearchPanel();
-    map.closePopup();
-    map.flyToBounds(ALL_BOUNDS, { padding: [30, 30], animate: true, duration: 1.2 });
+function applyFilters() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  let count = 0;
+  document.querySelectorAll('.facility-item').forEach(el => {
+    const ok = (currentFilter === 'all' || el.dataset.type === currentFilter)
+            && (!q || el.dataset.name.includes(q));
+    el.classList.toggle('hidden', !ok);
+    if (ok) count++;
   });
+  document.getElementById('shown-count').textContent = count;
+}
 
-} // ── END initMap ────────────────────────────────────────────────────────────
+// ── RESET ZOOM & AUTO-FIT LAYAR ────────────────────────────────────────────
+const resetZoomBtn = document.getElementById('resetZoomBtn');
+const ALL_BOUNDS = L.latLngBounds(facilities.map(f => [f.lat, f.lng]));
+
+map.fitBounds(ALL_BOUNDS, { padding: [30, 30] });
+
+resetZoomBtn.addEventListener('click', () => {
+  closeSearchPanel();
+  map.closePopup(); 
+  map.flyToBounds(ALL_BOUNDS, { padding: [30, 30], animate: true, duration: 1.2 });
+});
+
+
+} // end initMap
+
 
 // ── LOADING SCREEN ─────────────────────────────────────────────────────────
 const loadingEl = document.createElement('div');
-loadingEl.id = 'loadingScreen';
-loadingEl.innerHTML = `
-  <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
-    <div style="width:44px;height:44px;border:4px solid rgba(201,162,39,.3);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;">Memuat Data...</div>
-    <div style="font-size:.75rem;color:var(--text-dim);">Mengambil data dari Google Sheets</div>
-  </div>`;
 Object.assign(loadingEl.style, {
   position:'absolute', inset:'0', zIndex:'9999',
-  background:'rgba(15,32,53,0.92)', backdropFilter:'blur(4px)',
+  background:'rgba(15,32,53,0.93)', backdropFilter:'blur(4px)',
   display:'flex', alignItems:'center', justifyContent:'center',
+  flexDirection:'column', gap:'14px',
 });
+loadingEl.innerHTML = `
+  <div style="width:44px;height:44px;border:4px solid rgba(201,162,39,.25);
+    border-top-color:#c9a227;border-radius:50%;animation:sheetSpin .8s linear infinite;"></div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;
+    color:#c9a227;letter-spacing:1px;text-transform:uppercase;">Memuat Data...</div>
+  <div style="font-size:.75rem;color:rgba(240,244,248,.5);">Mengambil data dari Google Sheets</div>`;
 document.querySelector('.main').appendChild(loadingEl);
 
-// Add spin keyframe
-const styleEl = document.createElement('style');
-styleEl.textContent = `@keyframes spin { to { transform: rotate(360deg); } }`;
-document.head.appendChild(styleEl);
+const _spinStyle = document.createElement('style');
+_spinStyle.textContent = '@keyframes sheetSpin{to{transform:rotate(360deg)}}';
+document.head.appendChild(_spinStyle);
 
-// ── FETCH & LAUNCH ─────────────────────────────────────────────────────────
-const PROXIES =[
-  url => url,                                                          
-  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,          
-  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, 
+// ── FETCH WITH CORS PROXY FALLBACK ─────────────────────────────────────────
+const PROXIES = [
+  u => u,
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
 ];
 
-async function fetchWithFallback(url) {
+async function fetchCSV(url) {
   for (const proxy of PROXIES) {
     try {
-      const res = await fetch(proxy(url), { cache: 'no-store' });
+      const res = await fetch(proxy(url), { cache:'no-store' });
       if (res.ok) return await res.text();
-    } catch(e) { /* try next */ }
+    } catch(_) {}
   }
-  throw new Error('Semua koneksi gagal');
+  throw new Error('Gagal terhubung ke Google Sheets');
 }
 
-fetchWithFallback(SHEET_CSV_URL)
+function showError(msg) {
+  loadingEl.innerHTML = `
+    <div style="text-align:center;padding:24px;max-width:280px;">
+      <div style="font-size:2rem;margin-bottom:10px;">⚠️</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;
+        color:#f87171;margin-bottom:8px;">Gagal Memuat Data</div>
+      <div style="font-size:.78rem;color:rgba(240,244,248,.6);margin-bottom:16px;">${msg}</div>
+      <button onclick="location.reload()" style="padding:8px 22px;background:#c9a227;
+        color:#0f2035;border:none;border-radius:20px;font-weight:700;cursor:pointer;
+        font-family:'Barlow Condensed',sans-serif;font-size:.9rem;text-transform:uppercase;">
+        Coba Lagi</button>
+    </div>`;
+}
+
+// ── BOOT ───────────────────────────────────────────────────────────────────
+fetchCSV(SHEET_URL)
   .then(csv => {
-    facilities = parseCSV(csv).map(rowToFacility).filter(f => !isNaN(f.lat) && !isNaN(f.lng));
+    const rows = parseCSV(csv);
+    facilities = rows
+      .map(rowToFacility)
+      .filter(f => f.id && !isNaN(f.lat) && !isNaN(f.lng) && typeConfig[f.type]);
+
+    if (facilities.length === 0) throw new Error('Tidak ada data valid di sheet');
+
+    document.getElementById('shown-count').textContent = facilities.length;
     loadingEl.remove();
     initMap();
   })
   .catch(err => {
-    loadingEl.innerHTML = `
-      <div style="text-align:center;padding:24px;">
-        <div style="font-size:2rem;margin-bottom:12px;">⚠️</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;color:#f87171;margin-bottom:8px;">Gagal Memuat Data</div>
-        <div style="font-size:.8rem;color:var(--text-dim);margin-bottom:16px;">${err.message}</div>
-        <div style="font-size:.75rem;color:var(--text-dim);">Pastikan Google Sheet sudah di-publish<br>dan koneksi internet aktif.</div>
-        <button onclick="location.reload()" style="margin-top:16px;padding:8px 20px;background:var(--gold);color:#0f2035;border:none;border-radius:20px;font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;text-transform:uppercase;">Coba Lagi</button>
-      </div>`;
-    console.error('Sheet fetch error:', err);
+    console.error(err);
+    showError(err.message);
   });
 
 </script>
