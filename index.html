@@ -512,7 +512,7 @@ function buildPopupContent(f) {
   } else {
     gurl = `https://www.google.com/maps/search/${encodeURIComponent(f.gmapsQuery)}`;
   }
-  const hrs  = f.visitHours.replace(/\n/g,'<br>');
+  const hrs  = f.visitHours;
   return `<div class="popup-card">
     <div class="popup-header">
       <div class="popup-type-row">
