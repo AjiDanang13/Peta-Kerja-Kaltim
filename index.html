@@ -364,69 +364,7 @@
 
     /* Leaflet UI Overrides */
     .leaflet-control-zoom { margin-top: 14px !important; margin-right: 14px !important; }
-
-    /* ── MAP LEGEND ── */
-    #mapLegend {
-      position: absolute; bottom: 84px; right: 14px; z-index: 700;
-      background: rgba(255,255,255,0.96);
-      border-radius: 12px; padding: 10px 14px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-      font-family: 'Barlow', sans-serif;
-      min-width: 140px;
-    }
-    #mapLegend.hidden { display: none; }
-    .legend-title {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 800; font-size: .75rem;
-      text-transform: uppercase; letter-spacing: .6px;
-      color: #1a2e44; margin-bottom: 8px;
-    }
-    .legend-item {
-      display: flex; align-items: center; gap: 8px;
-      margin-bottom: 6px; font-size: .75rem; color: #444;
-    }
-    .legend-dot {
-      width: 14px; height: 14px; border-radius: 50%;
-      flex-shrink: 0; display: flex; align-items: center;
-      justify-content: center;
-    }
-    .legend-dot svg { width: 10px; height: 10px; }
-    #legendToggle {
-      position: absolute; bottom: 84px; right: 72px; z-index: 700;
-      background: white; border: none; border-radius: 10px;
-      width: 40px; height: 40px; cursor: pointer;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-      font-size: 18px; display: flex; align-items: center; justify-content: center;
-      transition: transform .15s;
-    }
-    #legendToggle:active { transform: scale(.9); }
-    #mapLegend {
-      position: absolute; bottom: 134px; right: 14px; z-index: 700;
-      background: rgba(255,255,255,0.96);
-      border-radius: 12px; padding: 10px 14px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-      font-family: 'Barlow', sans-serif;
-      min-width: 140px;
-    }
-    #mapLegend.hidden { display: none; }
-    .pin-name-label {
-      position: absolute;
-      bottom: 100%; left: 50%; transform: translateX(-50%) translateY(-4px);
-      background: rgba(15,32,53,0.92);
-      color: #e8c84a;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700; font-size: .7rem;
-      padding: 3px 8px; border-radius: 6px;
-      white-space: nowrap; pointer-events: none;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      letter-spacing: .3px;
-    }
-    .pin-name-label::after {
-      content: '';
-      position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-      border: 4px solid transparent;
-      border-top-color: rgba(15,32,53,0.92);
-    }
+  </style>
 </head>
 <body>
 
@@ -448,20 +386,8 @@
   <!-- FAB Search Button (Bottom Left) -->
   <div id="searchToggle">🔍</div>
 
-  <!-- Legend toggle button -->
-  <button id="legendToggle" title="Keterangan">🗺</button>
-
-  <!-- Legend panel -->
-  <div id="mapLegend" class="hidden">
-    <div class="legend-title">Keterangan</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#4a9ede"></div>Lapas</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#e8943a"></div>Rutan</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#e882b0"></div>LPP</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#a78bfa"></div>LPKA</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#2ec48a"></div>LPN</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#fb923c"></div>Bapas</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#f87171"></div>Kanwil</div>
-  </div>
+  <!-- Reset Zoom Button (Bottom Right) -->
+  <div id="resetZoomBtn" title="Reset Tampilan">
     <span class="rzoom-icon">⊙</span>
     <span class="rzoom-label">Reset</span>
   </div>
@@ -582,14 +508,6 @@ document.body.appendChild(loadingEl);
 // ── BOOT VIA PAPAPARSE ─────────────────────────────────────────────────────
 const _pp = document.createElement('script');
 _pp.src = 'https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js';
-_pp.onerror = () => {
-  loadingEl.innerHTML = '<div style="text-align:center;padding:24px;max-width:280px;">'
-    + '<div style="font-size:2rem;margin-bottom:10px;">⚠️</div>'
-    + '<div style="font-family:Barlow Condensed,sans-serif;font-size:1.1rem;font-weight:700;color:#f87171;margin-bottom:8px;">Gagal Memuat Library</div>'
-    + '<div style="font-size:.78rem;color:rgba(240,244,248,.6);margin-bottom:16px;">Tidak bisa memuat PapaParse. Periksa koneksi internet.</div>'
-    + '<button onclick="location.reload()" style="padding:8px 22px;background:#c9a227;color:#0f2035;border:none;border-radius:20px;font-weight:700;cursor:pointer;">Coba Lagi</button>'
-    + '</div>';
-};
 _pp.onload = () => {
   Papa.parse(SHEET_URL, {
     download:       true,
@@ -603,13 +521,18 @@ _pp.onload = () => {
       initMap();
     },
     error(err) {
-      const msg = (err && err.message) ? err.message : 'Periksa koneksi internet dan pastikan sheet sudah di-publish.';
-      loadingEl.innerHTML = '<div style="text-align:center;padding:24px;max-width:280px;">'
-        + '<div style="font-size:2rem;margin-bottom:10px;">⚠️</div>'
-        + '<div style="font-family:Barlow Condensed,sans-serif;font-size:1.1rem;font-weight:700;color:#f87171;margin-bottom:8px;">Gagal Memuat Data</div>'
-        + '<div style="font-size:.78rem;color:rgba(240,244,248,.6);margin-bottom:16px;">' + msg + '</div>'
-        + '<button onclick="location.reload()" style="padding:8px 22px;background:#c9a227;color:#0f2035;border:none;border-radius:20px;font-weight:700;cursor:pointer;font-family:Barlow Condensed,sans-serif;font-size:.9rem;text-transform:uppercase;">Coba Lagi</button>'
-        + '</div>';
+      loadingEl.innerHTML = `
+        <div style="text-align:center;padding:24px;max-width:280px;">
+          <div style="font-size:2rem;margin-bottom:10px;">⚠️</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;
+            font-weight:700;color:#f87171;margin-bottom:8px;">Gagal Memuat Data</div>
+          <div style="font-size:.78rem;color:rgba(240,244,248,.6);margin-bottom:16px;">
+            ${err.message || 'Periksa koneksi internet dan pastikan sheet sudah di-publish.'}</div>
+          <button onclick="location.reload()" style="padding:8px 22px;background:#c9a227;
+            color:#0f2035;border:none;border-radius:20px;font-weight:700;cursor:pointer;
+            font-family:'Barlow Condensed',sans-serif;font-size:.9rem;text-transform:uppercase;">
+            Coba Lagi</button>
+        </div>`;
     }
   });
 };
@@ -655,35 +578,16 @@ const typeLabel = {
   lpn:'Lapas Narkotika', bapas:'Balai Pemasyarakatan', kanwil:'Kantor Wilayah',
 };
 
-// ── TYPE SVG ICONS (for pins — no letters) ────────────────────────────────
-const typeIcon = {
-  lapas:  `<svg viewBox="0 0 24 24" fill="white" width="15" height="15"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l5 2.18V11c0 3.5-2.33 6.79-5 7.93-2.67-1.14-5-4.43-5-7.93V7.18L12 5z"/></svg>`,
-  rutan:  `<svg viewBox="0 0 24 24" fill="white" width="15" height="15"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>`,
-  lpp:    `<svg viewBox="0 0 24 24" fill="white" width="15" height="15"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`,
-  lpka:   `<svg viewBox="0 0 24 24" fill="white" width="15" height="15"><path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.81 6-4.72 7.28L13 17v5h5l-1.22-1.22C19.91 19.07 22 15.76 22 12c0-5.18-3.95-9.45-9-9.95zM11 2.05C5.95 2.55 2 6.82 2 12c0 3.76 2.09 7.07 5.22 8.78L6 22h5v-5l-2.28 2.28C6.81 18 5 15.21 5 12c0-4.08 3.05-7.44 7-7.93V2.05z"/></svg>`,
-  lpn:    `<svg viewBox="0 0 24 24" fill="white" width="15" height="15"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.32C18 2.55 15.45 0 12 0 8.55 0 6 2.55 6 4.68c0 .44.11.88.18 1.32H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-8-4c1.34 0 2.67.6 2.67 2.68 0 .44-.15.88-.35 1.32H9.68c-.2-.44-.35-.88-.35-1.32C9.33 2.6 10.66 2 12 2z"/></svg>`,
-  bapas:  `<svg viewBox="0 0 24 24" fill="white" width="15" height="15"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`,
-  kanwil: `<svg viewBox="0 0 24 24" fill="white" width="15" height="15"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>`,
-};
-
 // ── MAKE PIN ICON ────────────────────────────────────────────
 function makeIcon(f, active = false) {
-  const c    = typeConfig[f.type];
-  const W    = active ? 44 : 32;
-  const TH   = active ? 11 : 8;
-  const bw   = active ? 3 : 2;
-  const photo = facilityPhotos[f.id] || null;
-  const icon  = typeIcon[f.type] || '';
+  const c   = typeConfig[f.type];
+  const W   = active ? 48 : 36;
+  const TH  = active ? 12 : 9;
+  const bw  = active ? 2.5 : 2;
 
-  // Inside the circle: photo if available, SVG icon as fallback
-  const inner = photo
-    ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
-           onerror="this.style.display='none';this.nextSibling.style.display='flex'"/>
-       <span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;">${icon}</span>`
-    : `<span style="display:flex;width:100%;height:100%;align-items:center;justify-content:center;">${icon}</span>`;
-
-  const nameLabel = active
-    ? `<div class="pin-name-label">${f.name}</div>` : '';
+  const inner = `<span style="display:flex;width:100%;height:100%;align-items:center;justify-content:center;
+          font-weight:800;font-size:${active?15:11}px;color:white;
+          font-family:'Barlow Condensed',sans-serif;">${c.letter}</span>`;
 
   const pulse = active
     ? `<div style="position:absolute;top:${-(bw+5)}px;left:${-(bw+5)}px;
@@ -694,14 +598,11 @@ function makeIcon(f, active = false) {
   const html = `<div class="${active ? 'pin-active-wrap' : ''}" style="
       position:relative;width:${W}px;height:${W+TH}px;
       filter:drop-shadow(0 3px 6px rgba(0,0,0,0.3));">
-    ${nameLabel}
     ${pulse}
     <div style="position:absolute;top:0;left:0;width:${W}px;height:${W}px;
-        border-radius:50%;background:${c.color};border:${bw}px solid ${c.color};
+        border-radius:50%;background:${c.color};border:${bw}px solid white;
         box-sizing:border-box;overflow:hidden;
-        display:flex;align-items:center;justify-content:center;">
-      ${inner}
-    </div>
+        display:flex;align-items:center;justify-content:center;">${inner}</div>
     <div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);
         width:0;height:0;
         border-left:${Math.round(W*.18)}px solid transparent;
@@ -709,7 +610,7 @@ function makeIcon(f, active = false) {
         border-top:${TH}px solid ${c.color};"></div>
   </div>`;
 
-  return L.divIcon({ html, className:'', iconSize:[W,W+TH], iconAnchor:[W/2,W+TH], popupAnchor:[0,-(W+TH+28)] });
+  return L.divIcon({ html, className:'', iconSize:[W,W+TH], iconAnchor:[W/2,W+TH], popupAnchor:[0,-(W+TH+4)] });
 }
 
 // ── SOCIAL ICONS HTML ──────────────────────────────────────────────────────
@@ -934,20 +835,7 @@ function renderList() {
 }
 renderList();
 
-// ── LEGEND TOGGLE ──────────────────────────────────────────────────────────
-const legendToggle = document.getElementById('legendToggle');
-const mapLegend    = document.getElementById('mapLegend');
-
-legendToggle.addEventListener('click', e => {
-  e.stopPropagation();
-  const isOpen = mapLegend.classList.toggle('hidden');
-  // Shift legend toggle up when legend is open
-  legendToggle.style.bottom = isOpen ? '84px' : `${84 + mapLegend.offsetHeight + 8}px`;
-  mapLegend.classList.toggle('hidden', isOpen);
-});
-
-// Close legend on map click
-map.on('click', () => mapLegend.classList.add('hidden'));
+// ── SEARCH PANEL TOGGLE ────────────────────────────────────────────────────
 const searchToggle = document.getElementById('searchToggle');
 const searchPanel  = document.getElementById('searchPanel');
 
