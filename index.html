@@ -288,6 +288,66 @@
 
     /* Leaflet UI Overrides */
     .leaflet-control-zoom { margin-top: 14px !important; margin-right: 14px !important; }
+
+    /* ── ANIMATIONS ── */
+
+    /* 1. Pin drop on load */
+    @keyframes pinDrop {
+      0%   { transform: translateY(-60px) scale(0.6); opacity: 0; }
+      60%  { transform: translateY(6px)   scale(1.08); opacity: 1; }
+      80%  { transform: translateY(-4px)  scale(0.97); }
+      100% { transform: translateY(0)     scale(1);    opacity: 1; }
+    }
+    .pin-drop { animation: pinDrop 0.45s cubic-bezier(.36,.07,.19,.97) both; }
+
+    /* 2. Pin bounce on select */
+    @keyframes pinBounce {
+      0%   { transform: translateY(0)    scale(1);    }
+      25%  { transform: translateY(-12px) scale(1.15); }
+      50%  { transform: translateY(3px)  scale(0.95); }
+      75%  { transform: translateY(-5px) scale(1.05); }
+      100% { transform: translateY(0)    scale(1);    }
+    }
+    .pin-bounce { animation: pinBounce 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+
+    /* 4. Popup fade + slide in */
+    @keyframes popupIn {
+      0%   { opacity: 0; transform: translateY(10px) scale(0.97); }
+      100% { opacity: 1; transform: translateY(0)    scale(1);    }
+    }
+    .leaflet-popup-content-wrapper {
+      animation: popupIn 0.25s cubic-bezier(.32,1,.46,1) both;
+    }
+
+    /* 6. Skeleton shimmer for loading */
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position:  400px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #1e3a52 25%, #254d6b 50%, #1e3a52 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s infinite linear;
+      border-radius: 6px;
+    }
+
+    /* 7. List items slide in */
+    @keyframes listSlideIn {
+      0%   { opacity: 0; transform: translateX(-18px); }
+      100% { opacity: 1; transform: translateX(0);     }
+    }
+    .facility-item { animation: none; } /* reset, applied dynamically */
+    .facility-item.animating {
+      animation: listSlideIn 0.25s ease both;
+    }
+
+    /* 8. Filter fade transition */
+    .facility-item { transition: opacity 0.2s ease, transform 0.2s ease; }
+    .facility-item.hiding {
+      opacity: 0;
+      transform: scale(0.96);
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -380,57 +440,7 @@ function rowToFacility(row) {
   };
 }
 
-// ── LOADING SCREEN ─────────────────────────────────────────────────────────
-const loadingEl = document.createElement('div');
-Object.assign(loadingEl.style, {
-  position:'fixed', inset:'0', zIndex:'99999',
-  background:'rgba(15,32,53,0.95)', backdropFilter:'blur(6px)',
-  display:'flex', alignItems:'center', justifyContent:'center',
-  flexDirection:'column', gap:'14px',
-});
-loadingEl.innerHTML = `
-  <div style="width:44px;height:44px;border:4px solid rgba(201,162,39,.2);
-    border-top-color:#c9a227;border-radius:50%;animation:_spin .8s linear infinite;"></div>
-  <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;
-    color:#c9a227;letter-spacing:1px;text-transform:uppercase;">Memuat Data...</div>
-  <style>@keyframes _spin{to{transform:rotate(360deg)}}</style>`;
-document.body.appendChild(loadingEl);
-
-// ── BOOT VIA PAPAPARSE ─────────────────────────────────────────────────────
-const _pp = document.createElement('script');
-_pp.src = 'https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js';
-_pp.onload = () => {
-  Papa.parse(SHEET_URL, {
-    download:       true,
-    header:         true,
-    skipEmptyLines: true,
-    complete(results) {
-      facilities = results.data
-        .map(rowToFacility)
-        .filter(f => f.id && !isNaN(f.lat) && !isNaN(f.lng));
-      loadingEl.remove();
-      initMap();
-    },
-    error(err) {
-      loadingEl.innerHTML = `
-        <div style="text-align:center;padding:24px;max-width:280px;">
-          <div style="font-size:2rem;margin-bottom:10px;">⚠️</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;
-            font-weight:700;color:#f87171;margin-bottom:8px;">Gagal Memuat Data</div>
-          <div style="font-size:.78rem;color:rgba(240,244,248,.6);margin-bottom:16px;">
-            ${err.message || 'Periksa koneksi internet dan pastikan sheet sudah di-publish.'}</div>
-          <button onclick="location.reload()" style="padding:8px 22px;background:#c9a227;
-            color:#0f2035;border:none;border-radius:20px;font-weight:700;cursor:pointer;
-            font-family:'Barlow Condensed',sans-serif;font-size:.9rem;text-transform:uppercase;">
-            Coba Lagi</button>
-        </div>`;
-    }
-  });
-};
-document.head.appendChild(_pp);
-
 // ── TYPE CONFIG ────────────────────────────────────────────────────────────
-function initMap() {
 const typeConfig = {
   lapas: { color:'#4a9ede', label:'LAPAS',  letter:'L' },
   rutan: { color:'#e8943a', label:'RUTAN',  letter:'R' },
@@ -512,7 +522,7 @@ function buildPopupContent(f) {
   } else {
     gurl = `https://www.google.com/maps/search/${encodeURIComponent(f.gmapsQuery)}`;
   }
-  const hrs  = f.visitHours;
+  const hrs = f.visitHours || '—';
   return `<div class="popup-card">
     <div class="popup-header">
       <div class="popup-type-row">
@@ -534,6 +544,7 @@ function buildPopupContent(f) {
 }
 
 // ── MAP INIT ───────────────────────────────────────────────────────────────
+function initMap() {
 const BOUNDS = L.latLngBounds(L.latLng(-2.8, 114.5), L.latLng(5.2, 119.2));
 
 const map = L.map('map', {
@@ -588,12 +599,24 @@ cityGroups.forEach(group => {
   group._marker = m;
 });
 
-// Inisialisasi Marker Pin
+// Inisialisasi Marker Pin — with staggered drop animation
 const markers = {};
-facilities.forEach(f => {
+facilities.forEach((f, i) => {
   const m = L.marker([f.lat, f.lng], { icon: makeIcon(f) })
     .bindPopup(buildPopupContent(f), { maxWidth:300, minWidth:280 });
   m.on('click', e => { L.DomEvent.stopPropagation(e); selectFacility(f.id); });
+  m.on('add', () => {
+    // Stagger the drop animation by index
+    const el = m.getElement();
+    if (el) {
+      el.style.animationDelay = `${i * 60}ms`;
+      el.classList.add('pin-drop');
+      el.addEventListener('animationend', () => {
+        el.classList.remove('pin-drop');
+        el.style.animationDelay = '';
+      }, { once: true });
+    }
+  });
   markers[f.id] = m;
 });
 
@@ -659,6 +682,15 @@ function selectFacility(id) {
   const f  = facilities.find(x => x.id === id);
 
   markers[id].setIcon(makeIcon(f, true));
+
+  // Bounce animation on selected pin
+  const el = markers[id].getElement();
+  if (el) {
+    el.classList.remove('pin-bounce');
+    void el.offsetWidth; // force reflow
+    el.classList.add('pin-bounce');
+    el.addEventListener('animationend', () => el.classList.remove('pin-bounce'), { once: true });
+  }
   document.getElementById(`fi-${id}`)?.classList.add('active');
   document.getElementById(`fi-${id}`)?.scrollIntoView({ behavior:'smooth', block:'nearest' });
   closeSearchPanel();
@@ -676,7 +708,7 @@ const listEl = document.getElementById('facilityList');
 
 function renderList() {
   listEl.innerHTML = '';
-  facilities.forEach(f => {
+  facilities.forEach((f, i) => {
     const div = document.createElement('div');
     div.className = 'facility-item';
     div.id = `fi-${f.id}`;
@@ -690,6 +722,13 @@ function renderList() {
       </div>
       <span class="fi-badge ${f.type}">${typeConfig[f.type].label}</span>
     </div>`;
+    // Staggered slide-in
+    div.style.animationDelay = `${i * 35}ms`;
+    div.classList.add('animating');
+    div.addEventListener('animationend', () => {
+      div.classList.remove('animating');
+      div.style.animationDelay = '';
+    }, { once: true });
     div.addEventListener('click', e => {
       e.stopPropagation();
       selectFacility(f.id);
@@ -736,8 +775,16 @@ function applyFilters() {
   document.querySelectorAll('.facility-item').forEach(el => {
     const ok = (currentFilter === 'all' || el.dataset.type === currentFilter)
             && (!q || el.dataset.name.includes(q));
-    el.classList.toggle('hidden', !ok);
-    if (ok) count++;
+    if (ok) {
+      el.classList.remove('hiding');
+      el.classList.remove('hidden');
+      count++;
+    } else {
+      el.classList.add('hiding');
+      setTimeout(() => {
+        if (el.classList.contains('hiding')) el.classList.add('hidden');
+      }, 200);
+    }
   });
   document.getElementById('shown-count').textContent = count;
 }
@@ -754,7 +801,55 @@ resetZoomBtn.addEventListener('click', () => {
   map.flyToBounds(ALL_BOUNDS, { padding: [30, 30], animate: true, duration: 1.2 });
 });
 
-} // ── END initMap ──────────────────────────────────────────────────────────
+} // ── END initMap ────────────────────────────────────────────────────────────
+
+// ── LOADING SCREEN ─────────────────────────────────────────────────────────
+const loadingEl = document.createElement('div');
+Object.assign(loadingEl.style, {
+  position:'fixed', inset:'0', zIndex:'99999',
+  background:'rgba(15,32,53,0.95)', backdropFilter:'blur(6px)',
+  display:'flex', alignItems:'center', justifyContent:'center',
+  flexDirection:'column', gap:'14px',
+});
+loadingEl.innerHTML = `
+  <div style="width:44px;height:44px;border:4px solid rgba(201,162,39,.2);
+    border-top-color:#c9a227;border-radius:50%;animation:_spin .8s linear infinite;"></div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;
+    color:#c9a227;letter-spacing:1px;text-transform:uppercase;">Memuat Data...</div>
+  <style>@keyframes _spin{to{transform:rotate(360deg)}}</style>`;
+document.body.appendChild(loadingEl);
+
+// ── BOOT VIA PAPAPARSE ─────────────────────────────────────────────────────
+const _pp = document.createElement('script');
+_pp.src = 'https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js';
+_pp.onload = () => {
+  Papa.parse(SHEET_URL, {
+    download: true, header: true, skipEmptyLines: true,
+    complete(results) {
+      facilities = results.data
+        .map(rowToFacility)
+        .filter(f => f.id && !isNaN(f.lat) && !isNaN(f.lng));
+      document.getElementById('shown-count').textContent = facilities.length;
+      loadingEl.remove();
+      initMap();
+    },
+    error(err) {
+      loadingEl.innerHTML = `
+        <div style="text-align:center;padding:24px;max-width:280px;">
+          <div style="font-size:2rem;margin-bottom:10px;">⚠️</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;
+            font-weight:700;color:#f87171;margin-bottom:8px;">Gagal Memuat Data</div>
+          <div style="font-size:.78rem;color:rgba(240,244,248,.6);margin-bottom:16px;">
+            Periksa koneksi internet dan pastikan sheet sudah di-publish.</div>
+          <button onclick="location.reload()" style="padding:8px 22px;background:#c9a227;
+            color:#0f2035;border:none;border-radius:20px;font-weight:700;cursor:pointer;
+            font-family:'Barlow Condensed',sans-serif;font-size:.9rem;text-transform:uppercase;">
+            Coba Lagi</button>
+        </div>`;
+    }
+  });
+};
+document.head.appendChild(_pp);
 
 </script>
 </body>
