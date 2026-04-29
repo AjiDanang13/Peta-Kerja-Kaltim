@@ -45,7 +45,7 @@
       width: 1.6em; height: 1.6em; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
       transition: all 0.3s ease;
-      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Logo_Kementrian_Imigrasi_dan_Pemasyarakatan_%282024%29.png/1280px-Logo_Kementrian_Imigrasi_dan_Pemasyarakatan_%282024%29.png?_=20241130141828');
+      background-image: url('assets/kemimipas-logo.png');
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
@@ -169,6 +169,19 @@
     .fi-icon.lpn    { background:rgba(46,196,138,.18);   color:#2ec48a; }
     .fi-icon.bapas  { background:rgba(251,146,60,.18);   color:#fb923c; }
     .fi-icon.kanwil { background:rgba(248,113,113,.18);  color:#f87171; }
+    /* Per-facility photo inside the icon box */
+    .fi-icon img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 4px;
+      display: block;
+    }
+    /* When a photo is present, hide the tinted background */
+    .fi-icon.has-photo {
+      background: transparent;
+      padding: 0;
+      overflow: hidden;
+    }
     .fi-info { flex:1; min-width:0; }
     .fi-name { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:.9rem; color:var(--white); line-height:1.2; }
     .fi-city { font-size:.7rem; color:var(--text-dim); margin-top:2px; }
@@ -238,6 +251,69 @@
     /* PIN ANIMATION */
     @keyframes pinPulse { 0%{transform:scale(1);} 40%{transform:scale(1.25);} 70%{transform:scale(0.95);} 100%{transform:scale(1);} }
     .pin-active-wrap { animation: pinPulse .4s ease forwards; }
+
+    /* ── POPUP FADE + SLIDE IN ── */
+    @keyframes popupAppear {
+      from { opacity:0; transform:translateY(12px) scale(0.96); }
+      to   { opacity:1; transform:translateY(0)    scale(1);    }
+    }
+    .leaflet-popup-content-wrapper {
+      animation: popupAppear 0.32s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+    }
+    .leaflet-popup-tip-container {
+      animation: popupAppear 0.32s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+      animation-delay: 0.06s !important;
+    }
+
+    /* ── SOCIAL ICONS STAGGER IN ── */
+    @keyframes socialPop {
+      from { opacity:0; transform:translateY(8px) scale(0.65); }
+      to   { opacity:1; transform:translateY(0)   scale(1);    }
+    }
+    .social-icons .social-btn {
+      opacity: 0;
+      animation: socialPop 0.24s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    .social-icons .social-btn:nth-child(1) { animation-delay: 0.18s; }
+    .social-icons .social-btn:nth-child(2) { animation-delay: 0.24s; }
+    .social-icons .social-btn:nth-child(3) { animation-delay: 0.30s; }
+    .social-icons .social-btn:nth-child(4) { animation-delay: 0.36s; }
+    .social-icons .social-btn:nth-child(5) { animation-delay: 0.42s; }
+    .social-icons .social-btn:nth-child(6) { animation-delay: 0.48s; }
+
+    /* ── SKELETON SHIMMER (loading state) ── */
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position:  400px 0; }
+    }
+    .skel {
+      background: linear-gradient(90deg,
+        rgba(255,255,255,0.04) 25%,
+        rgba(255,255,255,0.11) 50%,
+        rgba(255,255,255,0.04) 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.6s infinite linear;
+      border-radius: 6px;
+    }
+
+    /* ── LIST ITEM SLIDE-IN (cascade on panel open) ── */
+    @keyframes listItemSlideIn {
+      from { opacity:0; transform:translateX(-18px); }
+      to   { opacity:1; transform:translateX(0); }
+    }
+    .facility-item.fi-slide-in {
+      animation: listItemSlideIn 0.26s ease forwards;
+    }
+
+    /* ── SMOOTH FILTER TRANSITION ── */
+    .facility-item {
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    .facility-item.fi-invisible {
+      opacity: 0 !important;
+      transform: translateX(-6px) !important;
+      pointer-events: none;
+    }
 
     /* ── RESPONSIVE MOBILE FIXES ── */
     @media(max-width:640px) {
@@ -389,11 +465,35 @@ Object.assign(loadingEl.style, {
   flexDirection:'column', gap:'14px',
 });
 loadingEl.innerHTML = `
-  <div style="width:44px;height:44px;border:4px solid rgba(201,162,39,.2);
-    border-top-color:#c9a227;border-radius:50%;animation:_spin .8s linear infinite;"></div>
-  <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;
-    color:#c9a227;letter-spacing:1px;text-transform:uppercase;">Memuat Data...</div>
-  <style>@keyframes _spin{to{transform:rotate(360deg)}}</style>`;
+  <style>
+    @keyframes _spin{to{transform:rotate(360deg)}}
+    @keyframes _shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+    .sk{background:linear-gradient(90deg,rgba(255,255,255,.05) 25%,rgba(255,255,255,.13) 50%,rgba(255,255,255,.05) 75%);
+      background-size:800px 100%;animation:_shimmer 1.6s infinite linear;border-radius:6px;}
+  </style>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;
+    color:rgba(201,162,39,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;">Memuat Data…</div>
+  <div style="width:290px;background:#1e3a52;border-radius:16px;overflow:hidden;
+    box-shadow:0 8px 32px rgba(0,0,0,.5);">
+    <div style="padding:14px 16px 12px;border-bottom:1px solid rgba(201,162,39,.08);">
+      <div class="sk" style="width:55%;height:9px;margin-bottom:10px;"></div>
+      <div class="sk" style="width:80%;height:15px;"></div>
+    </div>
+    <div style="padding:14px 16px 20px;">
+      <div class="sk" style="width:50%;height:9px;margin-bottom:14px;"></div>
+      <div class="sk" style="width:72%;height:9px;margin-bottom:5px;"></div>
+      <div class="sk" style="width:60%;height:9px;margin-bottom:18px;"></div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <div class="sk" style="width:34px;height:34px;border-radius:9px;flex-shrink:0;"></div>
+        <div class="sk" style="width:34px;height:34px;border-radius:9px;flex-shrink:0;"></div>
+        <div class="sk" style="width:34px;height:34px;border-radius:9px;flex-shrink:0;"></div>
+        <div class="sk" style="width:34px;height:34px;border-radius:9px;flex-shrink:0;"></div>
+        <div class="sk" style="width:34px;height:34px;border-radius:9px;flex-shrink:0;"></div>
+        <div class="sk" style="width:34px;height:34px;border-radius:9px;flex-shrink:0;"></div>
+      </div>
+      <div class="sk" style="width:100%;height:38px;border-radius:9px;"></div>
+    </div>
+  </div>`;
 document.body.appendChild(loadingEl);
 
 // ── BOOT VIA PAPAPARSE ─────────────────────────────────────────────────────
@@ -682,8 +782,12 @@ function renderList() {
     div.id = `fi-${f.id}`;
     div.dataset.type = f.type;
     div.dataset.name = (f.name + ' ' + f.city).toLowerCase();
+    const iconContent = f.photo
+      ? `<img src="${f.photo}" alt="${f.name}" loading="lazy">`
+      : typeEmoji[f.type];
+    const iconClass = f.photo ? `fi-icon ${f.type} has-photo` : `fi-icon ${f.type}`;
     div.innerHTML = `<div class="fi-top">
-      <div class="fi-icon ${f.type}">${typeEmoji[f.type]}</div>
+      <div class="${iconClass}">${iconContent}</div>
       <div class="fi-info">
         <div class="fi-name">${f.name}</div>
         <div class="fi-city">${f.city}</div>
@@ -712,7 +816,20 @@ searchToggle.addEventListener('click', e => {
   e.stopPropagation();
   const isOpen = searchPanel.classList.toggle('open');
   searchToggle.classList.toggle('open', isOpen);
-  // Don't auto-focus - user must tap the input field to open keyboard
+  if (isOpen) {
+    // Cascade slide-in for visible items
+    const items = [...listEl.querySelectorAll('.facility-item:not(.hidden)')];
+    items.forEach((el, i) => {
+      el.classList.remove('fi-slide-in');
+      void el.offsetWidth; // force reflow to restart animation
+      el.style.animationDelay = `${i * 38}ms`;
+      el.classList.add('fi-slide-in');
+      el.addEventListener('animationend', () => {
+        el.classList.remove('fi-slide-in');
+        el.style.animationDelay = '';
+      }, { once: true });
+    });
+  }
 });
 
 map.on('click', closeSearchPanel);
@@ -736,8 +853,29 @@ function applyFilters() {
   document.querySelectorAll('.facility-item').forEach(el => {
     const ok = (currentFilter === 'all' || el.dataset.type === currentFilter)
             && (!q || el.dataset.name.includes(q));
-    el.classList.toggle('hidden', !ok);
-    if (ok) count++;
+
+    if (ok) {
+      count++;
+      clearTimeout(el._hideTimer);
+      if (el.classList.contains('hidden')) {
+        // Reveal: remove hidden first (so it's in flow), then remove fi-invisible to fade in
+        el.classList.add('fi-invisible');
+        el.classList.remove('hidden');
+        el.getBoundingClientRect(); // force reflow
+        el.classList.remove('fi-invisible');
+      } else {
+        el.classList.remove('fi-invisible');
+      }
+    } else {
+      if (!el.classList.contains('hidden')) {
+        // Hide: fade out, then apply display:none after transition
+        el.classList.add('fi-invisible');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(() => {
+          el.classList.add('hidden');
+        }, 200);
+      }
+    }
   });
   document.getElementById('shown-count').textContent = count;
 }
