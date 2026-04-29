@@ -582,6 +582,14 @@ document.body.appendChild(loadingEl);
 // ── BOOT VIA PAPAPARSE ─────────────────────────────────────────────────────
 const _pp = document.createElement('script');
 _pp.src = 'https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js';
+_pp.onerror = () => {
+  loadingEl.innerHTML = '<div style="text-align:center;padding:24px;max-width:280px;">'
+    + '<div style="font-size:2rem;margin-bottom:10px;">⚠️</div>'
+    + '<div style="font-family:Barlow Condensed,sans-serif;font-size:1.1rem;font-weight:700;color:#f87171;margin-bottom:8px;">Gagal Memuat Library</div>'
+    + '<div style="font-size:.78rem;color:rgba(240,244,248,.6);margin-bottom:16px;">Tidak bisa memuat PapaParse. Periksa koneksi internet.</div>'
+    + '<button onclick="location.reload()" style="padding:8px 22px;background:#c9a227;color:#0f2035;border:none;border-radius:20px;font-weight:700;cursor:pointer;">Coba Lagi</button>'
+    + '</div>';
+};
 _pp.onload = () => {
   Papa.parse(SHEET_URL, {
     download:       true,
@@ -595,18 +603,13 @@ _pp.onload = () => {
       initMap();
     },
     error(err) {
-      loadingEl.innerHTML = `
-        <div style="text-align:center;padding:24px;max-width:280px;">
-          <div style="font-size:2rem;margin-bottom:10px;">⚠️</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;
-            font-weight:700;color:#f87171;margin-bottom:8px;">Gagal Memuat Data</div>
-          <div style="font-size:.78rem;color:rgba(240,244,248,.6);margin-bottom:16px;">
-            ${err.message || 'Periksa koneksi internet dan pastikan sheet sudah di-publish.'}</div>
-          <button onclick="location.reload()" style="padding:8px 22px;background:#c9a227;
-            color:#0f2035;border:none;border-radius:20px;font-weight:700;cursor:pointer;
-            font-family:'Barlow Condensed',sans-serif;font-size:.9rem;text-transform:uppercase;">
-            Coba Lagi</button>
-        </div>`;
+      const msg = (err && err.message) ? err.message : 'Periksa koneksi internet dan pastikan sheet sudah di-publish.';
+      loadingEl.innerHTML = '<div style="text-align:center;padding:24px;max-width:280px;">'
+        + '<div style="font-size:2rem;margin-bottom:10px;">⚠️</div>'
+        + '<div style="font-family:Barlow Condensed,sans-serif;font-size:1.1rem;font-weight:700;color:#f87171;margin-bottom:8px;">Gagal Memuat Data</div>'
+        + '<div style="font-size:.78rem;color:rgba(240,244,248,.6);margin-bottom:16px;">' + msg + '</div>'
+        + '<button onclick="location.reload()" style="padding:8px 22px;background:#c9a227;color:#0f2035;border:none;border-radius:20px;font-weight:700;cursor:pointer;font-family:Barlow Condensed,sans-serif;font-size:.9rem;text-transform:uppercase;">Coba Lagi</button>'
+        + '</div>';
     }
   });
 };
