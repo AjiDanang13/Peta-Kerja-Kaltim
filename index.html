@@ -434,24 +434,33 @@ const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKueAYOMUQ5T
 let facilities = [];
 
 function rowToFacility(row) {
+  // 1. Create a "Clean" version of the row (ignores spaces and capital letters in headers)
+  const cleanRow = {};
+  Object.keys(row).forEach(key => {
+    cleanRow[key.trim().toLowerCase()] = row[key];
+  });
+
+  // 2. Safely grab the photo path
+  const rawPhoto = cleanRow['photo'] ? cleanRow['photo'].trim() : null;
+
   return {
-    id:         parseInt(row.id),
-    name:       (row.name       || '').trim(),
-    type:       (row.type       || '').trim().toLowerCase(),
-    city:       (row.city       || '').trim(),
-    phone:      (row.phone      || '—').trim(),
-    lat:        parseFloat(row.lat),
-    lng:        parseFloat(row.lng),
-    visitHours: (row.visitHours || '').replace(/\|/g, '<br>').trim(),
-    gmapsQuery: (row.gmapsQuery || '').trim(),
-    photo:      (row.photo      || '').trim() || null,
+    id:         parseInt(cleanRow['id']),
+    name:       (cleanRow['name'] || '').trim(),
+    type:       (cleanRow['type'] || '').trim().toLowerCase(),
+    city:       (cleanRow['city'] || '').trim(),
+    phone:      (cleanRow['phone'] || '—').trim(),
+    lat:        parseFloat(cleanRow['lat']),
+    lng:        parseFloat(cleanRow['lng']),
+    visitHours: (cleanRow['visithours'] || cleanRow['hours'] || '').replace(/\|/g, '<br>').trim(),
+    gmapsQuery: (cleanRow['gmapsquery'] || '').trim(),
+    photo:      rawPhoto || null, // This is the path: assets/photos/...
     social: {
-      instagram: (row.instagram || '').trim() || null,
-      facebook:  (row.facebook  || '').trim() || null,
-      twitter:   (row.twitter   || '').trim() || null,
-      youtube:   (row.youtube   || '').trim() || null,
-      tiktok:    (row.tiktok    || '').trim() || null,
-      whatsapp:  (row.whatsapp  || '').trim() || null,
+      instagram: (cleanRow['instagram'] || '').trim() || null,
+      facebook:  (cleanRow['facebook']  || '').trim() || null,
+      twitter:   (cleanRow['twitter']   || '').trim() || null,
+      youtube:   (cleanRow['youtube']   || '').trim() || null,
+      tiktok:    (cleanRow['tiktok']    || '').trim() || null,
+      whatsapp:  (cleanRow['whatsapp']  || '').trim() || null,
     }
   };
 }
