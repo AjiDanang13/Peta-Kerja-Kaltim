@@ -366,7 +366,7 @@ function rowToFacility(row) {
     phone:      (row.phone      || '—').trim(),
     lat:        parseFloat(row.lat),
     lng:        parseFloat(row.lng),
-    visitHours: (row.visitHours || '').replace(/\|/g, '\n').trim(),
+    visitHours: (row.visitHours || '').replace(/\|/g, '<br>').trim(),
     gmapsQuery: (row.gmapsQuery || '').trim(),
     photo:      (row.photo      || '').trim() || null,
     social: {
