@@ -242,7 +242,7 @@
     .gmaps-btn {
       display:flex; align-items:center; justify-content:center; gap:6px;
       width:100%; margin-top:14px; background:#4285f4; border-radius:9px;
-      padding:10px; color:#fff !important; font-size:.82rem; font-weight:700;
+      padding:10px; color:#fff; font-size:.82rem; font-weight:700;
       text-decoration:none; letter-spacing:.3px; transition:background .2s;
     }
     .gmaps-btn:active { background:#3367d6; }
@@ -365,6 +365,26 @@
     /* Leaflet UI Overrides */
     .leaflet-control-zoom { margin-top: 14px !important; margin-right: 14px !important; }
 
+    /* ── PIN HOVER & ACTIVE (mirrors cluster behaviour) ── */
+    .leaflet-marker-icon > div {
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+    .leaflet-marker-icon:hover > div {
+      transform: scale(1.12) translateY(-2px);
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.45)) !important;
+    }
+    .leaflet-marker-icon:active > div {
+      transform: scale(0.88);
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)) !important;
+    }
+    /* Block long-press image save on pin photos */
+    .leaflet-marker-icon img {
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      pointer-events: none;
+    }
+
     /* ── LEGEND ── */
     #legendBtn {
       position: absolute; bottom: 84px; right: 14px;
@@ -430,7 +450,7 @@
 </header>
 
 <div class="main">
-  <div id="map"></div>
+  <div id="map" oncontextmenu="return false"></div>
 
   <!-- FAB Search Button (Bottom Left) -->
   <div id="searchToggle">🔍</div>
@@ -621,23 +641,33 @@ const typeLabel = {
   lpn:'Lapas Narkotika', bapas:'Balai Pemasyarakatan', kanwil:'Kantor Wilayah',
 };
 
+// ── ZOOM-BASED PIN SIZE ────────────────────────────────────────────────────
+function pinSize(zoom) {
+  if (zoom >= 16) return 44;
+  if (zoom >= 13) return 36;
+  if (zoom >= 10) return 28;
+  return 22;
+}
+
 // ── MAKE PIN ICON ────────────────────────────────────────────
 function makeIcon(f, active = false) {
   const c     = typeConfig[f.type];
-  const W     = active ? 48 : 36;
-  const TH    = active ? 12 : 9;
+  const base  = pinSize(map.getZoom());
+  const W     = active ? base + 12 : base;
+  const TH    = Math.round(W * 0.25);
   const bw    = active ? 3 : 2;
+  const fs    = Math.round(W * 0.32);
   const photo = facilityPhotos[f.id] || null;
 
-  // Photo fills the circle; fallback to letter if photo fails
   const inner = photo
-    ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"
+    ? `<img src="${photo}" draggable="false" oncontextmenu="return false"
+           style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;-webkit-touch-callout:none;"
            onerror="this.style.display='none';this.nextSibling.style.display='flex'"/>
        <span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;
-           font-weight:800;font-size:${active?15:11}px;color:white;
+           font-weight:800;font-size:${fs}px;color:white;
            font-family:'Barlow Condensed',sans-serif;">${c.letter}</span>`
     : `<span style="display:flex;width:100%;height:100%;align-items:center;justify-content:center;
-           font-weight:800;font-size:${active?15:11}px;color:white;
+           font-weight:800;font-size:${fs}px;color:white;
            font-family:'Barlow Condensed',sans-serif;">${c.letter}</span>`;
 
   const pulse = active
@@ -820,7 +850,15 @@ function updateGroupPositions() {
 }
 
 map.on('zoom', updateGroupPositions);
-map.on('zoomend', updateGroupPositions);
+map.on('zoomend', () => {
+  updateGroupPositions();
+  // Resize all visible pins to match new zoom level
+  facilities.forEach(f => {
+    if (map.hasLayer(markers[f.id])) {
+      markers[f.id].setIcon(makeIcon(f, f.id === activeId));
+    }
+  });
+});
 
 // ── EVENTS ──
 map.on('popupclose', () => {
