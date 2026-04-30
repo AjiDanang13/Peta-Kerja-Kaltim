@@ -364,6 +364,55 @@
 
     /* Leaflet UI Overrides */
     .leaflet-control-zoom { margin-top: 14px !important; margin-right: 14px !important; }
+
+    /* ── LEGEND ── */
+    #legendBtn {
+      position: absolute; bottom: 84px; right: 14px;
+      z-index: 800; width: 48px; height: 48px;
+      background: var(--navy); border: 2px solid var(--gold); color: var(--gold);
+      border-radius: 14px; cursor: pointer; user-select: none;
+      display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 2px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+      transition: background .2s, transform .15s;
+    }
+    #legendBtn:active { transform: scale(.92); }
+    #legendBtn .lb-icon { font-size: 17px; line-height: 1; }
+    #legendBtn .lb-label {
+      font-family: 'Barlow Condensed', sans-serif; font-size: .5rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .6px; line-height: 1;
+    }
+    #legendPanel {
+      position: absolute; bottom: 144px; right: 14px;
+      z-index: 799;
+      background: rgba(255,255,255,0.97);
+      border-radius: 14px; padding: 12px 14px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      min-width: 148px;
+      transform: scale(0.9) translateY(8px);
+      transform-origin: bottom right;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+    #legendPanel.open {
+      opacity: 1; pointer-events: all;
+      transform: scale(1) translateY(0);
+    }
+    .leg-title {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 800;
+      font-size: .72rem; text-transform: uppercase; letter-spacing: .6px;
+      color: #1a2e44; margin-bottom: 8px; padding-bottom: 6px;
+      border-bottom: 1px solid #eee;
+    }
+    .leg-item {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 6px; font-size: .75rem; color: #333;
+      font-family: 'Barlow', sans-serif;
+    }
+    .leg-item:last-child { margin-bottom: 0; }
+    .leg-dot {
+      width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0;
+      border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
 <body>
@@ -390,6 +439,24 @@
   <div id="resetZoomBtn" title="Reset Tampilan">
     <span class="rzoom-icon">⊙</span>
     <span class="rzoom-label">Reset</span>
+  </div>
+
+  <!-- Legend Button -->
+  <div id="legendBtn">
+    <span class="lb-icon">🗺</span>
+    <span class="lb-label">Info</span>
+  </div>
+
+  <!-- Legend Panel -->
+  <div id="legendPanel">
+    <div class="leg-title">Keterangan Warna</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#4a9ede"></div>Lapas</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#e8943a"></div>Rutan</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#e882b0"></div>LPP (Perempuan)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#a78bfa"></div>LPKA (Anak)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#2ec48a"></div>LPN (Narkotika)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#fb923c"></div>Bapas</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#f87171"></div>Kanwil</div>
   </div>
 
   <!-- Slide-up search panel -->
@@ -580,14 +647,22 @@ const typeLabel = {
 
 // ── MAKE PIN ICON ────────────────────────────────────────────
 function makeIcon(f, active = false) {
-  const c   = typeConfig[f.type];
-  const W   = active ? 48 : 36;
-  const TH  = active ? 12 : 9;
-  const bw  = active ? 2.5 : 2;
+  const c     = typeConfig[f.type];
+  const W     = active ? 48 : 36;
+  const TH    = active ? 12 : 9;
+  const bw    = active ? 3 : 2;
+  const photo = facilityPhotos[f.id] || null;
 
-  const inner = `<span style="display:flex;width:100%;height:100%;align-items:center;justify-content:center;
-          font-weight:800;font-size:${active?15:11}px;color:white;
-          font-family:'Barlow Condensed',sans-serif;">${c.letter}</span>`;
+  // Photo fills the circle; fallback to letter if photo fails
+  const inner = photo
+    ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"
+           onerror="this.style.display='none';this.nextSibling.style.display='flex'"/>
+       <span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;
+           font-weight:800;font-size:${active?15:11}px;color:white;
+           font-family:'Barlow Condensed',sans-serif;">${c.letter}</span>`
+    : `<span style="display:flex;width:100%;height:100%;align-items:center;justify-content:center;
+           font-weight:800;font-size:${active?15:11}px;color:white;
+           font-family:'Barlow Condensed',sans-serif;">${c.letter}</span>`;
 
   const pulse = active
     ? `<div style="position:absolute;top:${-(bw+5)}px;left:${-(bw+5)}px;
@@ -600,7 +675,8 @@ function makeIcon(f, active = false) {
       filter:drop-shadow(0 3px 6px rgba(0,0,0,0.3));">
     ${pulse}
     <div style="position:absolute;top:0;left:0;width:${W}px;height:${W}px;
-        border-radius:50%;background:${c.color};border:${bw}px solid white;
+        border-radius:50%;background:${c.color};border:${bw}px solid ${c.color};
+        outline:${bw}px solid white;outline-offset:-${bw*2}px;
         box-sizing:border-box;overflow:hidden;
         display:flex;align-items:center;justify-content:center;">${inner}</div>
     <div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);
@@ -834,6 +910,15 @@ function renderList() {
   });
 }
 renderList();
+
+// ── LEGEND TOGGLE ──────────────────────────────────────────────────────────
+const legendBtn   = document.getElementById('legendBtn');
+const legendPanel = document.getElementById('legendPanel');
+legendBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  legendPanel.classList.toggle('open');
+});
+map.on('click', () => legendPanel.classList.remove('open'));
 
 // ── SEARCH PANEL TOGGLE ────────────────────────────────────────────────────
 const searchToggle = document.getElementById('searchToggle');
