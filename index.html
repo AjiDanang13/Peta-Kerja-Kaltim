@@ -621,23 +621,32 @@ const typeLabel = {
   lpn:'Lapas Narkotika', bapas:'Balai Pemasyarakatan', kanwil:'Kantor Wilayah',
 };
 
+// ── ZOOM-BASED PIN SIZE ────────────────────────────────────────────────────
+function pinSize(zoom) {
+  if (zoom >= 16) return 44;
+  if (zoom >= 13) return 36;
+  if (zoom >= 10) return 28;
+  return 22;
+}
+
 // ── MAKE PIN ICON ────────────────────────────────────────────
 function makeIcon(f, active = false) {
   const c     = typeConfig[f.type];
-  const W     = active ? 48 : 36;
-  const TH    = active ? 12 : 9;
+  const base  = pinSize(map.getZoom());
+  const W     = active ? base + 12 : base;
+  const TH    = Math.round(W * 0.25);
   const bw    = active ? 3 : 2;
+  const fs    = Math.round(W * 0.32);
   const photo = facilityPhotos[f.id] || null;
 
-  // Photo fills the circle; fallback to letter if photo fails
   const inner = photo
     ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"
            onerror="this.style.display='none';this.nextSibling.style.display='flex'"/>
        <span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;
-           font-weight:800;font-size:${active?15:11}px;color:white;
+           font-weight:800;font-size:${fs}px;color:white;
            font-family:'Barlow Condensed',sans-serif;">${c.letter}</span>`
     : `<span style="display:flex;width:100%;height:100%;align-items:center;justify-content:center;
-           font-weight:800;font-size:${active?15:11}px;color:white;
+           font-weight:800;font-size:${fs}px;color:white;
            font-family:'Barlow Condensed',sans-serif;">${c.letter}</span>`;
 
   const pulse = active
@@ -820,7 +829,15 @@ function updateGroupPositions() {
 }
 
 map.on('zoom', updateGroupPositions);
-map.on('zoomend', updateGroupPositions);
+map.on('zoomend', () => {
+  updateGroupPositions();
+  // Resize all visible pins to match new zoom level
+  facilities.forEach(f => {
+    if (map.hasLayer(markers[f.id])) {
+      markers[f.id].setIcon(makeIcon(f, f.id === activeId));
+    }
+  });
+});
 
 // ── EVENTS ──
 map.on('popupclose', () => {
