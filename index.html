@@ -51,14 +51,12 @@
       background-position: center;
     }
     .logo-shield::after { content: ''; }
-    .header-text { display: flex; flex-direction: column; justify-content: center; }
     .header-text h1 {
       font-family:'Barlow Condensed',sans-serif; font-size:1.15rem; font-weight:800;
       color:var(--gold); letter-spacing:.5px; line-height:1.1; text-transform:uppercase;
     }
     .header-text p { font-size:.7rem; color:var(--text-dim); margin-top:2px; }
     .title-mobile { display: none; }
-    .subtitle-mobile { display: none; }
     
     .header-stats { margin-left:auto; display:flex; gap:16px; align-items:center; flex-shrink:0; }
     .stat-box { text-align:center; }
@@ -171,14 +169,12 @@
     .fi-icon.lpn    { background:rgba(46,196,138,.18);   color:#2ec48a; }
     .fi-icon.bapas  { background:rgba(251,146,60,.18);   color:#fb923c; }
     .fi-icon.kanwil { background:rgba(248,113,113,.18);  color:#f87171; }
-    /* Per-facility photo inside the icon box */
     .fi-icon img {
       width: 100%; height: 100%;
       object-fit: cover;
       border-radius: 4px;
       display: block;
     }
-    /* When a photo is present, hide the tinted background */
     .fi-icon.has-photo {
       background: transparent;
       padding: 0;
@@ -254,7 +250,7 @@
     @keyframes pinPulse { 0%{transform:scale(1);} 40%{transform:scale(1.25);} 70%{transform:scale(0.95);} 100%{transform:scale(1);} }
     .pin-active-wrap { animation: pinPulse .4s ease forwards; }
 
-    /* ── POPUP FADE + SLIDE IN (triggered via JS, not CSS, to prevent double-fire) ── */
+    /* ── POPUP FADE + SLIDE IN ── */
     @keyframes popupAppear {
       from { opacity:0; transform:translateY(12px) scale(0.96); }
       to   { opacity:1; transform:translateY(0)    scale(1);    }
@@ -298,7 +294,7 @@
       border-radius: 6px;
     }
 
-    /* ── LIST ITEM SLIDE-IN (cascade on panel open) ── */
+    /* ── LIST ITEM SLIDE-IN ── */
     @keyframes listItemSlideIn {
       from { opacity:0; transform:translateX(-18px); }
       to   { opacity:1; transform:translateX(0); }
@@ -319,16 +315,14 @@
 
     /* ── RESPONSIVE MOBILE FIXES ── */
     @media(max-width:640px) {
-    header { padding: 6px 14px; gap: 10px; }
-    .logo-shield { width: 2.2em; height: 2.2em; background-size: contain; }
-    .logo-shield::after { content: ''; }
-    .title-mobile { display: none; }
-    .header-stats { display: none !important; }
-    .title-desktop { font-size: .85rem !important; }
-    .subtitle-desktop { font-size: .6rem; }
+      header { padding: 6px 14px; gap: 10px; }
+      .logo-shield { width: 2.2em; height: 2.2em; background-size: contain; }
+      .logo-shield::after { content: ''; }
+      .title-desktop, .subtitle-desktop, .header-stats { display: none !important; }
+      .title-mobile { display: block; font-size: 1.25rem; margin: 0; color: var(--gold); letter-spacing: .5px; }
     }
 
-    /* ── RESET ZOOM BUTTON (Bottom Right) ── */
+    /* ── RESET ZOOM BUTTON ── */
     #resetZoomBtn {
       position: absolute; bottom: 24px; right: 14px;
       z-index: 800; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -345,7 +339,7 @@
       text-transform: uppercase; letter-spacing: .6px; line-height: 1;
     }
 
-    /* ── CITY CLUSTER COMPACT (Hanya Angka) ── */
+    /* ── CITY CLUSTER COMPACT ── */
     .city-cluster-compact {
       background: var(--navy); border: 2.5px solid var(--gold);
       border-radius: 50%; width: 36px; height: 36px;
@@ -357,7 +351,7 @@
     .city-cluster-compact:active { transform: scale(0.85); background: var(--sidebar-bg); }
     .city-cluster-compact:hover { border-color: var(--white); color: var(--white); }
 
-    /* ── TOOLTIP STYLE (Nama Kota Muncul Saat Hover) ── */
+    /* ── TOOLTIP ── */
     .cluster-tooltip {
       background: var(--navy); color: var(--gold2); border: 1px solid var(--gold);
       border-radius: 6px; font-family: 'Barlow Condensed', sans-serif;
@@ -366,7 +360,6 @@
     }
     .leaflet-tooltip-top.cluster-tooltip::before { border-top-color: var(--gold); }
 
-    /* Leaflet UI Overrides */
     .leaflet-control-zoom { margin-top: 14px !important; margin-right: 14px !important; }
 
     /* ── LEGEND ── */
@@ -424,35 +417,31 @@
 <header>
   <div class="logo-shield"></div>
   <div class="header-text">
-    <h1 class="title-desktop">Direktorat Jenderal Pemasyarakatan Kalimantan Timur</h1>
-    <p class="subtitle-desktop">Kementerian Imigrasi dan Pemasyarakatan</p>
-    <h1 class="title-mobile">Ditjenpas Kaltim</h1>
+    <h1 class="title">Direktorat Jenderal Pemasyarakatan Kalimantan Timur</h1>
+    <p class="subtitle">Kementerian Imigrasi dan Pemasyarakatan</p>
   </div>
   <div class="header-stats">
-    <div class="stat-box"><div class="num" id="shown-count">17</div><div class="lbl">Tampil</div></div>
-    <div class="stat-box"><div class="num">17</div><div class="lbl">Total UPT</div></div>
+    <!-- FIX 2: Both counts are dynamic, initialised to — until data loads -->
+    <div class="stat-box"><div class="num" id="shown-count">—</div><div class="lbl">Tampil</div></div>
+    <div class="stat-box"><div class="num" id="total-count">—</div><div class="lbl">Total UPT</div></div>
   </div>
 </header>
 
 <div class="main">
   <div id="map"></div>
 
-  <!-- FAB Search Button (Bottom Left) -->
   <div id="searchToggle">🔍</div>
 
-  <!-- Reset Zoom Button (Bottom Right) -->
   <div id="resetZoomBtn" title="Reset Tampilan">
     <span class="rzoom-icon">⊙</span>
     <span class="rzoom-label">Reset</span>
   </div>
 
-  <!-- Legend Button -->
   <div id="legendBtn">
     <span class="lb-icon">🗺</span>
     <span class="lb-label">Info</span>
   </div>
 
-  <!-- Legend Panel -->
   <div id="legendPanel">
     <div class="leg-title">Keterangan Warna</div>
     <div class="leg-item"><div class="leg-dot" style="background:#4a9ede"></div>Lapas</div>
@@ -464,7 +453,6 @@
     <div class="leg-item"><div class="leg-dot" style="background:#f87171"></div>Kanwil</div>
   </div>
 
-  <!-- Slide-up search panel -->
   <div id="searchPanel">
     <div class="panel-inner">
       <div class="search-wrap">
@@ -488,7 +476,7 @@
 </div>
 
 <script>
-// ── SVG ICONS ─────────────────────────────────────────────────────────────
+// ── SVG ICONS ──────────────────────────────────────────────────────────────
 const SVG = {
   instagram:`<svg viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`,
   facebook:`<svg viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`,
@@ -506,15 +494,11 @@ const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSKueAYOMUQ5T
 let facilities = [];
 
 function rowToFacility(row) {
-  // 1. Create a "Clean" version of the row (ignores spaces and capital letters in headers)
   const cleanRow = {};
   Object.keys(row).forEach(key => {
     cleanRow[key.trim().toLowerCase()] = row[key];
   });
-
-  // 2. Safely grab the photo path
   const rawPhoto = cleanRow['photo'] ? cleanRow['photo'].trim() : null;
-
   return {
     id:         parseInt(cleanRow['id']),
     name:       (cleanRow['name'] || '').trim(),
@@ -525,7 +509,7 @@ function rowToFacility(row) {
     lng:        parseFloat(cleanRow['lng']),
     visitHours: (cleanRow['visithours'] || cleanRow['hours'] || '').replace(/\|/g, '<br>').trim(),
     gmapsQuery: (cleanRow['gmapsquery'] || '').trim(),
-    photo:      rawPhoto || null, // This is the path: assets/photos/...
+    photo:      rawPhoto || null,
     social: {
       instagram: (cleanRow['instagram'] || '').trim() || null,
       facebook:  (cleanRow['facebook']  || '').trim() || null,
@@ -541,51 +525,16 @@ function rowToFacility(row) {
 const loadingEl = document.createElement('div');
 Object.assign(loadingEl.style, {
   position:'fixed', inset:'0', zIndex:'99999',
-  background:'#0f2035',
+  background:'rgba(15,32,53,0.95)', backdropFilter:'blur(6px)',
   display:'flex', alignItems:'center', justifyContent:'center',
-  flexDirection:'column', gap:'0',
-  transition:'opacity .5s ease',
+  flexDirection:'column', gap:'14px',
 });
 loadingEl.innerHTML = `
-  <style>
-    @keyframes _navipulse {
-      0%   { opacity: 0.15; letter-spacing: 6px; }
-      50%  { opacity: 1;    letter-spacing: 10px; }
-      100% { opacity: 0.15; letter-spacing: 6px; }
-    }
-    @keyframes _lineGrow {
-      0%,100% { width: 20px; opacity: 0.3; }
-      50%      { width: 80px; opacity: 1; }
-    }
-    @keyframes _subFade {
-      0%,100% { opacity: 0.2; }
-      50%      { opacity: 0.7; }
-    }
-    ._navi-word {
-      font-family:'Barlow Condensed',sans-serif;
-      font-size: 2.8rem; font-weight: 800;
-      color: #e8c84a;
-      letter-spacing: 10px;
-      text-transform: uppercase;
-      animation: _navipulse 2s ease-in-out infinite;
-    }
-    ._navi-line {
-      height: 2px; background: #c9a227; border-radius: 1px;
-      margin: 8px auto 10px;
-      animation: _lineGrow 2s ease-in-out infinite;
-    }
-    ._navi-sub {
-      font-family:'Barlow Condensed',sans-serif;
-      font-size: 0.55rem; color: rgba(240,244,248,0.5);
-      letter-spacing: 1.5px; text-transform: uppercase;
-      text-align: center; max-width: 240px;
-      animation: _subFade 2s ease-in-out infinite;
-    }
-  </style>
-  <div class="_navi-word">NAVIPAS</div>
-  <div class="_navi-line"></div>
-  <div class="_navi-sub">Navigasi dan Informasi Wilayah Kerja<br>Pemasyarakatan KALTIM</div>
-`;
+  <style>@keyframes _spin{to{transform:rotate(360deg)}}</style>
+  <div style="width:48px;height:48px;border:5px solid rgba(255,255,255,0.2);
+    border-top-color:#ffffff;border-radius:50%;animation:_spin .75s linear infinite;"></div>
+  <div style="font-family:sans-serif;font-size:.85rem;
+    color:rgba(255,255,255,0.65);letter-spacing:.4px;margin-top:4px;">Memuat data...</div>`;
 document.body.appendChild(loadingEl);
 
 // ── BOOT VIA PAPAPARSE ─────────────────────────────────────────────────────
@@ -600,8 +549,7 @@ _pp.onload = () => {
       facilities = results.data
         .map(rowToFacility)
         .filter(f => f.id && !isNaN(f.lat) && !isNaN(f.lng));
-      loadingEl.style.opacity = '0';
-      setTimeout(() => loadingEl.remove(), 500);
+      loadingEl.remove();
       initMap();
     },
     error(err) {
@@ -624,6 +572,7 @@ document.head.appendChild(_pp);
 
 // ── TYPE CONFIG ────────────────────────────────────────────────────────────
 function initMap() {
+
 const typeConfig = {
   lapas: { color:'#4a9ede', label:'LAPAS',  letter:'L' },
   rutan: { color:'#e8943a', label:'RUTAN',  letter:'R' },
@@ -633,28 +582,26 @@ const typeConfig = {
   bapas: { color:'#fb923c', label:'BAPAS',  letter:'B' },
   kanwil:{ color:'#f87171', label:'KANWIL', letter:'K' },
 };
-const typeEmoji = { lapas:'🏛', rutan:'🔒', lpp:'🏠', lpka:'👦', lpn:'💊', bapas:'📋', kanwil:'🏢' };
 
-// ── PHOTO MAP — GitHub hosted building photos ──────────────────────────────
 const PHOTO_BASE = 'https://raw.githubusercontent.com/AjiDanang13/Peta-Kerja-Kaltim/main/assets/photos/';
 const facilityPhotos = {
-  1:  PHOTO_BASE + 'kanwil-kaltim.png',       // Kanwil Kaltim
-  2:  PHOTO_BASE + 'rutan-tanah-grogot.jpeg',  // Rutan Tanah Grogot
-  3:  PHOTO_BASE + 'bapas-balikpapan.png',     // Bapas Balikpapan
-  4:  PHOTO_BASE + 'lpka.jpeg',                // LPKA Tenggarong
-  5:  PHOTO_BASE + 'lapas-balikpapan.jpeg',    // Lapas Balikpapan
-  6:  PHOTO_BASE + 'rutan-tanjung-redeb.jpg',  // Rutan Tanjung Redeb
-  7:  PHOTO_BASE + 'lapas-samarinda.jpeg',     // Lapas Samarinda
-  8:  PHOTO_BASE + 'lapas-tenggarong.jpeg',    // Lapas Tenggarong
-  9:  PHOTO_BASE + 'lpp.jpeg',                 // LPP Tenggarong
-  10: PHOTO_BASE + 'rutan-balikpapan.jpeg',    // Rutan Balikpapan
-  11: PHOTO_BASE + 'bapas-balikpapan.png',     // Bapas Samarinda (gunakan sementara)
-  12: PHOTO_BASE + 'rutan-samarinda.png',      // Rutan Samarinda
-  13: PHOTO_BASE + 'lpn.jpeg',                 // LPN Samarinda
-  14: PHOTO_BASE + 'lapas-bontang.jpeg',       // Lapas Bontang
-  15: PHOTO_BASE + 'lapas-tarakan.png',        // Lapas Tarakan
-  16: PHOTO_BASE + 'lapas-nunukan.jpeg',       // Lapas Nunukan
-  17: PHOTO_BASE + 'bapas-tarakan.png',        // Bapas Tarakan
+  1:  PHOTO_BASE + 'kanwil-kaltim.png',
+  2:  PHOTO_BASE + 'rutan-tanah-grogot.jpeg',
+  3:  PHOTO_BASE + 'bapas-balikpapan.png',
+  4:  PHOTO_BASE + 'lpka.jpeg',
+  5:  PHOTO_BASE + 'lapas-balikpapan.jpeg',
+  6:  PHOTO_BASE + 'rutan-tanjung-redeb.jpg',
+  7:  PHOTO_BASE + 'lapas-samarinda.jpeg',
+  8:  PHOTO_BASE + 'lapas-tenggarong.jpeg',
+  9:  PHOTO_BASE + 'lpp.jpeg',
+  10: PHOTO_BASE + 'rutan-balikpapan.jpeg',
+  11: PHOTO_BASE + 'bapas-balikpapan.png',
+  12: PHOTO_BASE + 'rutan-samarinda.png',
+  13: PHOTO_BASE + 'lpn.jpeg',
+  14: PHOTO_BASE + 'lapas-bontang.jpeg',
+  15: PHOTO_BASE + 'lapas-tarakan.png',
+  16: PHOTO_BASE + 'lapas-nunukan.jpeg',
+  17: PHOTO_BASE + 'bapas-tarakan.png',
 };
 const typeLabel = {
   lapas:'Lembaga Pemasyarakatan', rutan:'Rumah Tahanan Negara',
@@ -662,7 +609,11 @@ const typeLabel = {
   lpn:'Lapas Narkotika', bapas:'Balai Pemasyarakatan', kanwil:'Kantor Wilayah',
 };
 
-// ── MAKE PIN ICON ────────────────────────────────────────────
+// ── FIX 2: Sync header counts now that data is loaded ─────────────────────
+document.getElementById('shown-count').textContent = facilities.length;
+document.getElementById('total-count').textContent  = facilities.length;
+
+// ── MAKE PIN ICON ──────────────────────────────────────────────────────────
 function makeIcon(f, active = false) {
   const c     = typeConfig[f.type];
   const W     = active ? 48 : 36;
@@ -670,7 +621,6 @@ function makeIcon(f, active = false) {
   const bw    = active ? 3 : 2;
   const photo = facilityPhotos[f.id] || null;
 
-  // Photo fills the circle; fallback to letter if photo fails
   const inner = photo
     ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"
            onerror="this.style.display='none';this.nextSibling.style.display='flex'"/>
@@ -736,7 +686,7 @@ function buildPopupContent(f) {
   } else {
     gurl = `https://www.google.com/maps/search/${encodeURIComponent(f.gmapsQuery)}`;
   }
-  const hrs  = f.visitHours;
+  const hrs = f.visitHours;
   return `<div class="popup-card">
     <div class="popup-header">
       <div class="popup-type-row">
@@ -772,7 +722,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r
   maxZoom: 20, subdomains: 'abcd', attribution: '&copy; CARTO'
 }).addTo(map);
 
-// ── DYNAMIC CITY GROUPS (Interpolasi Posisi) ────────────────────────────────
+// ── CITY GROUPS ────────────────────────────────────────────────────────────
 const cityGroups = [
   { key:'samarinda',     label:'Samarinda',    count:5, offsetLat:-0.600, offsetLng:117.250, trueLat:-0.460, trueLng:117.138, zoom:13, ids:[1,7,11,12,13] },
   { key:'balikpapan',    label:'Balikpapan',   count:3, offsetLat:-1.274, offsetLng:116.865, trueLat:-1.274, trueLng:116.865, zoom:13, ids:[3,5,10] },
@@ -785,7 +735,7 @@ const cityGroups = [
 ];
 
 let activeId = null;
-const ZOOM_THRESHOLD = 11; // Di bawah level ini = Tampil Grup. Di atas level ini = Tampil Pin individu.
+const ZOOM_THRESHOLD = 11;
 
 function makeCityGroupIcon(group) {
   return L.divIcon({
@@ -794,15 +744,13 @@ function makeCityGroupIcon(group) {
   });
 }
 
-// Inisialisasi Marker Grup
 cityGroups.forEach(group => {
   const m = L.marker([group.offsetLat, group.offsetLng], {
     icon: makeCityGroupIcon(group),
     zIndexOffset: 200,
-  }).bindTooltip(group.label, { 
-    className: 'cluster-tooltip', direction: 'top', offset: [0, -18], opacity: 1 
+  }).bindTooltip(group.label, {
+    className: 'cluster-tooltip', direction: 'top', offset: [0, -18], opacity: 1
   });
-  
   m.on('click', e => {
     L.DomEvent.stopPropagation(e);
     const groupFacilities = facilities.filter(f => group.ids.includes(f.id));
@@ -812,7 +760,6 @@ cityGroups.forEach(group => {
   group._marker = m;
 });
 
-// Inisialisasi Marker Pin
 const markers = {};
 facilities.forEach(f => {
   const m = L.marker([f.lat, f.lng], { icon: makeIcon(f) })
@@ -821,26 +768,23 @@ facilities.forEach(f => {
   markers[f.id] = m;
 });
 
-// ── LOGIKA POSISI DINAMIS & VISIBILITAS ──
+// ── DYNAMIC GROUP POSITIONS & VISIBILITY ───────────────────────────────────
 function updateGroupPositions() {
   const z = map.getZoom();
-  
-  // Interpolasi Posisi: Zoom 6.5 = Offset (Menjauh). Zoom 10 = Posisi Asli (True).
+
   let t = (z - 6.5) / (10 - 6.5);
   if (t < 0) t = 0;
   if (t > 1) t = 1;
-  t = t * t * (3 - 2 * t); // Smoothstep
+  t = t * t * (3 - 2 * t);
 
   const showBubbles = (z < ZOOM_THRESHOLD);
 
   cityGroups.forEach(g => {
-    // Geser posisi
     if (g._marker) {
       const lat = g.offsetLat * (1 - t) + g.trueLat * t;
       const lng = g.offsetLng * (1 - t) + g.trueLng * t;
       g._marker.setLatLng([lat, lng]);
     }
-    // Visibilitas Bubble
     if (showBubbles) {
       if (!map.hasLayer(g._marker)) map.addLayer(g._marker);
     } else {
@@ -848,7 +792,6 @@ function updateGroupPositions() {
     }
   });
 
-  // Visibilitas Pin Individu
   facilities.forEach(f => {
     const m = markers[f.id];
     const isVisible = !showBubbles || (activeId === f.id);
@@ -863,11 +806,19 @@ function updateGroupPositions() {
 map.on('zoom', updateGroupPositions);
 map.on('zoomend', updateGroupPositions);
 
-// ── EVENTS ──
+// ── EVENTS ──────────────────────────────────────────────────────────────────
+
+// FIX 1: Force-hide stale pin at cluster zoom after popup close
 map.on('popupclose', () => {
   if (activeId) {
     const oldF = facilities.find(x => x.id === activeId);
-    if (oldF) markers[activeId].setIcon(makeIcon(oldF, false));
+    if (oldF) {
+      markers[activeId].setIcon(makeIcon(oldF, false));
+      // If we're still at cluster zoom, explicitly remove the pin
+      if (map.getZoom() < ZOOM_THRESHOLD) {
+        map.removeLayer(markers[activeId]);
+      }
+    }
     document.getElementById(`fi-${activeId}`)?.classList.remove('active');
     activeId = null;
     updateGroupPositions();
@@ -876,7 +827,6 @@ map.on('popupclose', () => {
 
 function selectFacility(id) {
   if (activeId === id) { markers[id].openPopup(); return; }
-
   if (activeId) map.closePopup();
 
   activeId = id;
@@ -907,9 +857,7 @@ function renderList() {
     div.dataset.type = f.type;
     div.dataset.name = (f.name + ' ' + f.city).toLowerCase();
     const photo = facilityPhotos[f.id] || f.photo || null;
-    const iconContent = photo
-      ? `<img src="${photo}" alt="${f.name}" loading="lazy">`
-      : '';
+    const iconContent = photo ? `<img src="${photo}" alt="${f.name}" loading="lazy">` : '';
     const iconClass = photo ? `fi-icon ${f.type} has-photo` : `fi-icon ${f.type}`;
     div.innerHTML = `<div class="fi-top">
       <div class="${iconClass}">${iconContent}</div>
@@ -919,10 +867,7 @@ function renderList() {
       </div>
       <span class="fi-badge ${f.type}">${typeConfig[f.type].label}</span>
     </div>`;
-    div.addEventListener('click', e => {
-      e.stopPropagation();
-      selectFacility(f.id);
-    });
+    div.addEventListener('click', e => { e.stopPropagation(); selectFacility(f.id); });
     listEl.appendChild(div);
   });
 }
@@ -937,17 +882,25 @@ legendBtn.addEventListener('click', e => {
 });
 map.on('click', () => legendPanel.classList.remove('open'));
 
-// ── POPUP ANIMATION — fire once only on open ──────────────────────────────
+// ── FIX 3: Popup animation guard — prevents double-fire on mobile tap ──────
+let _popupAnimating = false;
+
 map.on('popupopen', () => {
+  if (_popupAnimating) return; // bail out if animation already in progress
+  _popupAnimating = true;
+
   const wrapper = document.querySelector('.leaflet-popup-content-wrapper');
   const tip     = document.querySelector('.leaflet-popup-tip-container');
   [wrapper, tip].forEach(el => {
     if (!el) return;
     el.classList.remove('popup-animate');
-    void el.offsetWidth; // force reflow so class removal registers
+    void el.offsetWidth;
     el.classList.add('popup-animate');
     el.addEventListener('animationend', () => el.classList.remove('popup-animate'), { once:true });
   });
+
+  // Reset guard after longest social icon animation (.48s delay + .24s duration = ~750ms)
+  setTimeout(() => { _popupAnimating = false; }, 750);
 });
 
 // ── SEARCH PANEL TOGGLE ────────────────────────────────────────────────────
@@ -964,11 +917,10 @@ searchToggle.addEventListener('click', e => {
   const isOpen = searchPanel.classList.toggle('open');
   searchToggle.classList.toggle('open', isOpen);
   if (isOpen) {
-    // Cascade slide-in for visible items
     const items = [...listEl.querySelectorAll('.facility-item:not(.hidden)')];
     items.forEach((el, i) => {
       el.classList.remove('fi-slide-in');
-      void el.offsetWidth; // force reflow to restart animation
+      void el.offsetWidth;
       el.style.animationDelay = `${i * 38}ms`;
       el.classList.add('fi-slide-in');
       el.addEventListener('animationend', () => {
@@ -1000,34 +952,29 @@ function applyFilters() {
   document.querySelectorAll('.facility-item').forEach(el => {
     const ok = (currentFilter === 'all' || el.dataset.type === currentFilter)
             && (!q || el.dataset.name.includes(q));
-
     if (ok) {
       count++;
       clearTimeout(el._hideTimer);
       if (el.classList.contains('hidden')) {
-        // Reveal: remove hidden first (so it's in flow), then remove fi-invisible to fade in
         el.classList.add('fi-invisible');
         el.classList.remove('hidden');
-        el.getBoundingClientRect(); // force reflow
+        el.getBoundingClientRect();
         el.classList.remove('fi-invisible');
       } else {
         el.classList.remove('fi-invisible');
       }
     } else {
       if (!el.classList.contains('hidden')) {
-        // Hide: fade out, then apply display:none after transition
         el.classList.add('fi-invisible');
         clearTimeout(el._hideTimer);
-        el._hideTimer = setTimeout(() => {
-          el.classList.add('hidden');
-        }, 200);
+        el._hideTimer = setTimeout(() => { el.classList.add('hidden'); }, 200);
       }
     }
   });
   document.getElementById('shown-count').textContent = count;
 }
 
-// ── RESET ZOOM & AUTO-FIT LAYAR ────────────────────────────────────────────
+// ── RESET ZOOM ─────────────────────────────────────────────────────────────
 const resetZoomBtn = document.getElementById('resetZoomBtn');
 const ALL_BOUNDS = L.latLngBounds(facilities.map(f => [f.lat, f.lng]));
 
@@ -1035,12 +982,11 @@ map.fitBounds(ALL_BOUNDS, { padding: [30, 30] });
 
 resetZoomBtn.addEventListener('click', () => {
   closeSearchPanel();
-  map.closePopup(); 
+  map.closePopup();
   map.flyToBounds(ALL_BOUNDS, { padding: [30, 30], animate: true, duration: 1.2 });
 });
 
-} // ── END initMap ──────────────────────────────────────────────────────────
-
+} // ── END initMap ───────────────────────────────────────────────────────────
 </script>
 </body>
 </html>
