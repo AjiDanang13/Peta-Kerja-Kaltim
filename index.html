@@ -51,12 +51,14 @@
       background-position: center;
     }
     .logo-shield::after { content: ''; }
+    .header-text { display: flex; flex-direction: column; justify-content: center; }
     .header-text h1 {
       font-family:'Barlow Condensed',sans-serif; font-size:1.15rem; font-weight:800;
       color:var(--gold); letter-spacing:.5px; line-height:1.1; text-transform:uppercase;
     }
     .header-text p { font-size:.7rem; color:var(--text-dim); margin-top:2px; }
     .title-mobile { display: none; }
+    .subtitle-mobile { display: none; }
     
     .header-stats { margin-left:auto; display:flex; gap:16px; align-items:center; flex-shrink:0; }
     .stat-box { text-align:center; }
@@ -420,8 +422,9 @@
 <header>
   <div class="logo-shield"></div>
   <div class="header-text">
-    <h1 class="title">Direktorat Jenderal Pemasyarakatan Kalimantan Timur</h1>
-    <p class="subtitle">Kementerian Imigrasi dan Pemasyarakatan</p>
+    <h1 class="title-desktop">Direktorat Jenderal Pemasyarakatan Kalimantan Timur</h1>
+    <p class="subtitle-desktop">Navigasi dan Informasi Wilayah Kerja Pemasyarakatan</p>
+    <h1 class="title-mobile">Ditjenpas Kaltim</h1>
   </div>
   <div class="header-stats">
     <div class="stat-box"><div class="num" id="shown-count">17</div><div class="lbl">Tampil</div></div>
@@ -536,16 +539,51 @@ function rowToFacility(row) {
 const loadingEl = document.createElement('div');
 Object.assign(loadingEl.style, {
   position:'fixed', inset:'0', zIndex:'99999',
-  background:'rgba(15,32,53,0.95)', backdropFilter:'blur(6px)',
+  background:'#0f2035',
   display:'flex', alignItems:'center', justifyContent:'center',
-  flexDirection:'column', gap:'14px',
+  flexDirection:'column', gap:'0',
+  transition:'opacity .5s ease',
 });
 loadingEl.innerHTML = `
-  <style>@keyframes _spin{to{transform:rotate(360deg)}}</style>
-  <div style="width:48px;height:48px;border:5px solid rgba(255,255,255,0.2);
-    border-top-color:#ffffff;border-radius:50%;animation:_spin .75s linear infinite;"></div>
-  <div style="font-family:sans-serif;font-size:.85rem;
-    color:rgba(255,255,255,0.65);letter-spacing:.4px;margin-top:4px;">Memuat data...</div>`;
+  <style>
+    @keyframes _navipulse {
+      0%   { opacity: 0.15; letter-spacing: 6px; }
+      50%  { opacity: 1;    letter-spacing: 10px; }
+      100% { opacity: 0.15; letter-spacing: 6px; }
+    }
+    @keyframes _lineGrow {
+      0%,100% { width: 20px; opacity: 0.3; }
+      50%      { width: 80px; opacity: 1; }
+    }
+    @keyframes _subFade {
+      0%,100% { opacity: 0.2; }
+      50%      { opacity: 0.7; }
+    }
+    ._navi-word {
+      font-family:'Barlow Condensed',sans-serif;
+      font-size: 2.8rem; font-weight: 800;
+      color: #e8c84a;
+      letter-spacing: 10px;
+      text-transform: uppercase;
+      animation: _navipulse 2s ease-in-out infinite;
+    }
+    ._navi-line {
+      height: 2px; background: #c9a227; border-radius: 1px;
+      margin: 8px auto 10px;
+      animation: _lineGrow 2s ease-in-out infinite;
+    }
+    ._navi-sub {
+      font-family:'Barlow Condensed',sans-serif;
+      font-size: 0.55rem; color: rgba(240,244,248,0.5);
+      letter-spacing: 1.5px; text-transform: uppercase;
+      text-align: center; max-width: 240px;
+      animation: _subFade 2s ease-in-out infinite;
+    }
+  </style>
+  <div class="_navi-word">NAVIPAS</div>
+  <div class="_navi-line"></div>
+  <div class="_navi-sub">Navigasi dan Informasi Wilayah Kerja<br>Pemasyarakatan KALTIM</div>
+`;
 document.body.appendChild(loadingEl);
 
 // ── BOOT VIA PAPAPARSE ─────────────────────────────────────────────────────
@@ -560,7 +598,8 @@ _pp.onload = () => {
       facilities = results.data
         .map(rowToFacility)
         .filter(f => f.id && !isNaN(f.lat) && !isNaN(f.lng));
-      loadingEl.remove();
+      loadingEl.style.opacity = '0';
+      setTimeout(() => loadingEl.remove(), 500);
       initMap();
     },
     error(err) {
