@@ -319,11 +319,13 @@
 
     /* ── RESPONSIVE MOBILE FIXES ── */
     @media(max-width:640px) {
-      header { padding: 6px 14px; gap: 10px; }
-      .logo-shield { width: 2.2em; height: 2.2em; background-size: contain; }
-      .logo-shield::after { content: ''; }
-      .title-desktop, .subtitle-desktop, .header-stats { display: none !important; }
-      .title-mobile { display: block; font-size: 1.25rem; margin: 0; color: var(--gold); letter-spacing: .5px; }
+    header { padding: 6px 14px; gap: 10px; }
+    .logo-shield { width: 2.2em; height: 2.2em; background-size: contain; }
+    .logo-shield::after { content: ''; }
+    .title-mobile { display: none; }
+    .header-stats { display: none !important; }
+    .title-desktop { font-size: .85rem !important; }
+    .subtitle-desktop { font-size: .6rem; }
     }
 
     /* ── RESET ZOOM BUTTON (Bottom Right) ── */
@@ -423,7 +425,7 @@
   <div class="logo-shield"></div>
   <div class="header-text">
     <h1 class="title-desktop">Direktorat Jenderal Pemasyarakatan Kalimantan Timur</h1>
-    <p class="subtitle-desktop">Navigasi dan Informasi Wilayah Kerja Pemasyarakatan</p>
+    <p class="subtitle-desktop">Kementerian Imigrasi dan Pemasyarakatan</p>
     <h1 class="title-mobile">Ditjenpas Kaltim</h1>
   </div>
   <div class="header-stats">
