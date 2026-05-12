@@ -833,8 +833,18 @@ cityGroups.forEach(group => {
 const markers = {};
 facilities.forEach(f => {
   const m = L.marker([f.lat, f.lng], { icon: makeIcon(f) })
-    .bindPopup(buildPopupContent(f), { maxWidth:300, minWidth:280 });
-  m.on('click', e => { L.DomEvent.stopPropagation(e); selectFacility(f.id); });
+    // Tambahkan autoPan: false agar peta tidak bergeser otomatis secara kasar
+    .bindPopup(buildPopupContent(f), { maxWidth:300, minWidth:280, autoPan: false });
+    
+  // Matikan event click bawaan Leaflet (mencegah popup otomatis terbuka sebelum animasi terbang)
+  m.off('click');
+
+  // Gunakan event click manual dari kita
+  m.on('click', e => { 
+    L.DomEvent.stopPropagation(e); 
+    selectFacility(f.id); 
+  });
+  
   markers[f.id] = m;
 });
 
